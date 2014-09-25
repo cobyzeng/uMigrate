@@ -7,22 +7,22 @@ You can use it to add/change/remove Document Types, Data Types, etc.
 
 1. Install uMigrate from [NuGet Gallery](http://nuget.org/uMigrate).
 2. Create your first migration by extending `UmbracoMigrationBase`:
-```csharp
-public class Migration_201409261039_First : UmbracoMigrationBase {
-    public override void Run() {
-        var dataType = DataTypes.Add("NewDataType", Constants.PropertyEditors.Textbox, null);
-        ContentTypes.Add("NewDocumentType")
-                    .AddProperty("NewProperty", dataType.Object);
-    }
-}
-```
 
+    ```csharp
+    public class Migration_201409261039_First : UmbracoMigrationBase {
+        public override void Run() {
+            var dataType = DataTypes.Add("NewDataType", Constants.PropertyEditors.Textbox, null);
+            ContentTypes.Add("NewDocumentType")
+                        .AddProperty("NewProperty", dataType.Object);
+        }
+    }
+    ```
 3. Rebuild and open your Umbraco site.
 
-4. Go to Settings > Document Types.
+4. Go to Settings > Document Types.  
 It should have a NewDocumentType type now, with a NewProperty of type NewDataType.
 
-5. Go to Developer > Migrations.
+5. Go to Developer > Migrations.  
 It should list Migration_201409261039_First -- open it to see the migration log.
 
 ## Notes
