@@ -1,0 +1,27 @@
+﻿<div class="umb-panel-header ng-scope" tabs="content.tabs">
+  <div class="row-fluid">
+    <span class="span12"><h1 class="headline">Migration</h1></span>
+        
+    <ul class="nav nav-tabs umb-nav-tabs span12">
+      <li class="active">
+        <a href="" data-toggle="tab">Details</a>
+      </li>
+    </ul>	
+  </div>
+</div>
+<div class="umb-panel-body umb-scrollable row-fluid">
+  <div class="umb-pane" data-ng-controller="mig.ViewController">
+    <div class="form-horizontal">
+      <umb-control-group label="Name">
+        <div class="umb-editor umb-readonlyvalue">{{model.name}}</div>
+      </umb-control-group>
+  
+      <umb-control-group label="Run Date">
+        <div class="umb-editor umb-readonlyvalue">{{model.date}}</div>
+      </umb-control-group>
+      <umb-control-group label="Log">
+        <div class="umb-editor umb-readonlyvalue sym-migration-log">{{model.log}}</div>
+      </umb-control-group>
+    </div>
+  </div>
+</div>
