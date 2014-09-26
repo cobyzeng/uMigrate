@@ -1,0 +1,1 @@
+nuget push *.nupkg -Source https://nuget.org -ApiKey %1

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using uMigrate.Properties;
 
 [assembly: AssemblyTitle("uMigrate")]
-[assembly: AssemblyDescription("Migration framework for Umbraco (Core).")]
+[assembly: AssemblyDescription("Migration framework for Umbraco (UI).")]
 [assembly: AssemblyCompany("Affinity ID")]
 [assembly: AssemblyProduct("uMigrate")]
 
@@ -12,10 +12,3 @@ using uMigrate.Properties;
 
 [assembly: AssemblyVersion(AssemblyInfo.VersionString)]
 [assembly: AssemblyFileVersion(AssemblyInfo.VersionString)]
-
-namespace uMigrate.Properties {
-    public static class AssemblyInfo {
-        // please follow SemVer here:
-        public const string VersionString = "0.6.12";
-    }
-}

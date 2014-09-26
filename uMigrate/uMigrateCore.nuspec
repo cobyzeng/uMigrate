@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>uMigrate.Core</id>
+    <version>$version$</version>
+    <title>uMigrate Core for Umbraco</title>    
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <description>$description$</description>
+    <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
+    <releaseNotes></releaseNotes>
+    <tags>Umbraco migrations</tags>
+  </metadata>
+</package>

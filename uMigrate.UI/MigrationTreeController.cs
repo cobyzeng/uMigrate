@@ -14,7 +14,7 @@ using Constants = Umbraco.Core.Constants;
 
 namespace uMigrate.UI {
     [PluginController("uMigrate")]
-    [Tree(Constants.Applications.Developer, "id.migrations", "Migrations", sortOrder: 8)]
+    [Tree(Constants.Applications.Developer, "umigrate", "Migrations", sortOrder: 8)]
     public class MigrationTreeController : TreeController {
         private readonly IMigrationRecordRepository _repository;
 
