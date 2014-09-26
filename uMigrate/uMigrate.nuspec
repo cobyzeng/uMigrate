@@ -3,10 +3,11 @@
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <title>$title$</title>
+    <title>$title$</title>    
     <authors>$author$</authors>
     <owners>$author$</owners>
     <description>$description$</description>
+    <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
     <releaseNotes></releaseNotes>
     <tags>Umbraco migrations</tags>
   </metadata>

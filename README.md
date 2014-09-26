@@ -5,7 +5,7 @@ You can use it to add/change/remove Document Types, Data Types, etc.
 
 ## Quick start
 
-1. Install uMigrate from [NuGet Gallery](http://nuget.org/uMigrate).
+1. Install uMigrate from [NuGet Gallery](http://nuget.org/packages/uMigrate).
 2. Create your first migration by extending `UmbracoMigrationBase`:
 
     ```csharp
