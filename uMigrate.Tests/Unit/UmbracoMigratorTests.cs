@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
+using uMigrate.Infrastructure;
+using uMigrate.Internal;
 
 namespace uMigrate.Tests.Unit {
     [TestFixture]

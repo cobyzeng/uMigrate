@@ -227,6 +227,8 @@
     <Compile Include="Fluent\IContentFilteredSetSyntax.cs" />
     <Compile Include="Fluent\IContentSetSyntax.cs" />
     <Compile Include="Fluent\IDatabaseSyntax.cs" />
+    <Compile Include="Internal\IMigrationTypeProvider.cs" />
+    <Compile Include="Internal\AppDomainAssemblyMigrationTypeProvider.cs" />
     <Compile Include="Internal\SyntaxImplementations\ContentSetSyntax.cs" />
     <Compile Include="Fluent\IDataTypeFilteredSetSyntax.cs" />
     <Compile Include="Fluent\IDataTypeSetSyntax.cs" />
@@ -248,16 +250,16 @@
     <Compile Include="Internal\SyntaxImplementations\DataTypeSetSyntax.cs" />
     <Compile Include="Internal\SyntaxImplementations\SetSyntaxBase.cs" />
     <Compile Include="IMigrationContext.cs" />
-    <Compile Include="IMigrationResolver.cs" />
+    <Compile Include="Internal\IMigrationResolver.cs" />
     <Compile Include="IUmbracoMigration.cs" />
-    <Compile Include="MigrationApplicationEventHandler.cs" />
-    <Compile Include="MigrationContext.cs" />
-    <Compile Include="MigrationResolver.cs" />
+    <Compile Include="Infrastructure\MigrationApplicationEventHandler.cs" />
+    <Compile Include="Internal\MigrationContext.cs" />
+    <Compile Include="Internal\MigrationResolver.cs" />
     <Compile Include="Internal\MigrationRecord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UmbracoMigrationBase.cs" />
     <Compile Include="UmbracoMigrationException.cs" />
-    <Compile Include="UmbracoMigrator.cs" />
+    <Compile Include="Infrastructure\UmbracoMigrator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -8,9 +8,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using uMigrate.Internal;
 
-namespace uMigrate {
+namespace uMigrate.Internal {
     public class MigrationContext : IMigrationContext {
         [NotNull]
         private readonly ServiceContext _services;

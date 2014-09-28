@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using uMigrate.Internal;
 
-namespace uMigrate {
+namespace uMigrate.Infrastructure {
     public class UmbracoMigrator {
         private readonly IMigrationResolver _migrationResolver;
         private readonly IMigrationContext _context;

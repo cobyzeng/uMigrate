@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using Umbraco.Core;
 using uMigrate.Internal;
 
-namespace uMigrate {
+namespace uMigrate.Infrastructure {
     [UsedImplicitly, PublicAPI]
     public class MigrationApplicationEventHandler : ApplicationEventHandler {
         // that's just for some performance optimizations, e.g. you may skip reacting to changes during migration.
@@ -27,7 +27,7 @@ namespace uMigrate {
 
             var logRepository = new DatabaseMigrationRecordRepository(applicationContext.DatabaseContext.Database);
 
-            var migrationResolver = new MigrationResolver();
+            var migrationResolver = new MigrationResolver(new AppDomainAssemblyMigrationTypeProvider());
             var context = new MigrationContext(applicationContext.Services, applicationContext.DatabaseContext.Database, logRepository);
             var migrator = new UmbracoMigrator(migrationResolver, context);
             migrator.Run();

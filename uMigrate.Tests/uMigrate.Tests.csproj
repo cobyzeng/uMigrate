@@ -234,6 +234,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unit\AppDomainAssemblyMigrationTypeProviderTests.cs" />
+    <Compile Include="Unit\MigrationResolverTests.cs" />
     <Compile Include="Unit\UmbracoMigrationBaseTests.cs" />
     <Compile Include="Unit\UmbracoMigratorTests.cs">
       <SubType>Code</SubType>
