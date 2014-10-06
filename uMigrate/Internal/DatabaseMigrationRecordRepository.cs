@@ -25,6 +25,19 @@ namespace uMigrate.Internal {
             _database.Insert(TableName, PrimaryKeyName, false, record);
         }
 
+        public void Save(IReadOnlyList<MigrationRecord> migrations) {
+            EnsureTable();
+            foreach (var migration in migrations) {
+                var exists = _database.ExecuteScalar<object>("SELECT 1 FROM " + TableFullName + " WHERE [Version] = @0", migration.Version) != null;
+                if (exists) {
+                    _database.Update(TableFullName, PrimaryKeyName, migration);
+                }
+                else {
+                    _database.Insert(TableFullName, PrimaryKeyName, false, migration);
+                }
+            }
+        }
+
         private void EnsureTable() {
             if (_database.TableExist(TableName))
                 return;

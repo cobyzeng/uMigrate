@@ -16,6 +16,6 @@ using uMigrate.Properties;
 namespace uMigrate.Properties {
     public static class AssemblyInfo {
         // please follow SemVer here:
-        public const string VersionString = "0.6.13";
+        public const string VersionString = "0.7.0";
     }
 }
