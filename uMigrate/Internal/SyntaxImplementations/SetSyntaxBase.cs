@@ -36,6 +36,14 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return NewSet((IEnumerable<TItem>)items);
         }
 
+        public TFilteredSetSyntax From([NotNull] params TItem[] items) {
+            return NewSet((IEnumerable<TItem>)items);
+        }
+
+        public TFilteredSetSyntax From([NotNull] IEnumerable<TItem> items) {
+            return NewSet(items);
+        }
+
         public TFilteredSetSyntax Where(Func<TItem, bool> predicate) {
             return NewSet(Objects.Where(predicate));
         }

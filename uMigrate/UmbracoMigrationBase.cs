@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using Umbraco.Core.Models;
 using uMigrate.Fluent;
 using uMigrate.Internal;
 using uMigrate.Internal.SyntaxImplementations;
