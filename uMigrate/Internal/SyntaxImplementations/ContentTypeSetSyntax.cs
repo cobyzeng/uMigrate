@@ -162,10 +162,8 @@ namespace uMigrate.Internal.SyntaxImplementations {
                     UpdatePropertyInsteadOfAdding(contentType, propertyType, dataType, setups);
                     return;
                 }
-
+                
                 propertyGroupName = propertyGroupName ?? _lastAddedPropertyGroupName;
-                AddPropertyGroupIfNeededInternal(contentType, propertyGroupName);
-
                 propertyType = new PropertyType(dataType) {
                     Name = propertyAlias,
                     Alias = propertyAlias,
@@ -177,6 +175,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
                 }
 
                 if (propertyGroupName != null) {
+                    AddPropertyGroupIfNeededInternal(contentType, propertyGroupName);
                     contentType.AddPropertyType(propertyType, propertyGroupName);
                 }
                 else {
