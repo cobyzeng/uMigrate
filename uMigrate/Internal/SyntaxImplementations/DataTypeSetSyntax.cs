@@ -29,7 +29,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             var all = Context.DataTypeService.GetAllDataTypeDefinitions();
             var existing = all.SingleOrDefault(t => t.Name == name);
             if (existing != null) {
-                Logger.Log("DataType: '{0}' already exists, skipping.");
+                Logger.Log("DataType: '{0}' already exists, skipping.", name);
                 return NewSet(existing);
             }
 
