@@ -129,6 +129,17 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return this;
         }
 
+        public IDataTypeSetSyntax Delete() {
+            foreach (var dataTypeDefinition in Objects){
+                Context.DataTypeService.Delete(dataTypeDefinition);
+                Logger.Log("DataType: deleted '{0}' (key '{1}').", 
+                    dataTypeDefinition.Name, 
+                    dataTypeDefinition.Key);
+            }
+
+            return this;
+        }
+
         private void ChangePropertyValues<TFrom, TTo>(IContentType contentType, PropertyType[] properties, Func<TFrom, TTo> change) {
             var contents = Context.ContentService.GetContentOfContentType(contentType.Id);
             contents.MigrateEach(c => {
