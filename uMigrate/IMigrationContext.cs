@@ -11,7 +11,8 @@ namespace uMigrate {
         [NotNull] IContentTypeService ContentTypeService { get; }
         [NotNull] IDataTypeService DataTypeService { get; }
         [NotNull] IFileService FileService { get; }
-        [NotNull] IMediaService MediaService { get; } 
+        [NotNull] IMediaService MediaService { get; }
+        [NotNull] IUserService UserService { get; } 
 
         [NotNull] IFileSystem GetFileSystem(string rootPath);
 

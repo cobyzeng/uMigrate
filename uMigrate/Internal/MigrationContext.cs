@@ -76,6 +76,10 @@ namespace uMigrate.Internal {
             get { return _services.MediaService; }
         }
 
+        public IUserService UserService {
+            get { return _services.UserService; }
+        }
+
         public IMigrationContext WithLogger(IMigrationLogger logger) {
             return new MigrationContext(_services, Database, MigrationRecords, logger);
         }
