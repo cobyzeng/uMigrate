@@ -12,10 +12,12 @@ using uMigrate.Properties;
 
 [assembly: AssemblyVersion(AssemblyInfo.VersionString)]
 [assembly: AssemblyFileVersion(AssemblyInfo.VersionString)]
+[assembly: AssemblyInformationalVersion(AssemblyInfo.InformationalVersionString)]
 
 namespace uMigrate.Properties {
     public static class AssemblyInfo {
         // please follow SemVer here:
-        public const string VersionString = "0.8.6";
+        public const string VersionString = "0.8.7";
+        public const string InformationalVersionString = VersionString;
     }
 }

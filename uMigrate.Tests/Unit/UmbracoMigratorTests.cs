@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using ClientDependency.Core.Logging;
+using log4net;
 using Moq;
 using NUnit.Framework;
 using uMigrate.Infrastructure;
@@ -20,7 +22,7 @@ namespace uMigrate.Tests.Unit {
             mockMigrationResolver.Setup(x => x.GetAllMigrations())
                 .Returns(new[] { mockMigration.Object });
 
-            new UmbracoMigrator(mockMigrationResolver.Object, context).Run();
+            new UmbracoMigrator(mockMigrationResolver.Object, context, MockLogger()).Run();
 
             mockMigration.Verify(x => x.Migrate(It.IsAny<IMigrationContext>()), Times.Once());
         }
@@ -28,6 +30,10 @@ namespace uMigrate.Tests.Unit {
         private static IMigrationContext MockMigrationContext() {
             var mock = new Mock<IMigrationContext> { DefaultValue = DefaultValue.Mock };
             return mock.Object;
+        }
+
+        private static ILog MockLogger() {
+            return new Mock<ILog>().Object;
         }
     }
 }

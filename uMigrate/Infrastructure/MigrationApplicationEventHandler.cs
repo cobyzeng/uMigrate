@@ -2,6 +2,7 @@
 using System.Security.Principal;
 using System.Web;
 using JetBrains.Annotations;
+using log4net;
 using Umbraco.Core;
 using uMigrate.Internal;
 
@@ -29,7 +30,9 @@ namespace uMigrate.Infrastructure {
 
             var migrationResolver = new MigrationResolver(new AppDomainAssemblyMigrationTypeProvider());
             var context = new MigrationContext(applicationContext.Services, applicationContext.DatabaseContext.Database, logRepository);
-            var migrator = new UmbracoMigrator(migrationResolver, context);
+            var logger = LogManager.GetLogger(typeof(UmbracoMigrator));
+            var migrator = new UmbracoMigrator(migrationResolver, context, logger);
+
             migrator.Run();
         }
     }
