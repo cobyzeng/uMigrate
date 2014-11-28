@@ -58,6 +58,9 @@ namespace uMigrate.Internal.SyntaxImplementations {
             otherContentTypes.Change(other => {
                 var allowed = other.AllowedContentTypes.AsList();
                 ChangeWithManualSave(c => {
+                    if (allowed.Any(a => a.Id.Value == c.Id))
+                        return;
+
                     allowed.Add(new ContentTypeSort {
                         Id = new Lazy<int>(() => c.Id),
                         Alias = c.Alias,
