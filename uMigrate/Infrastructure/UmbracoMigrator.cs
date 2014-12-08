@@ -75,8 +75,7 @@ namespace uMigrate.Infrastructure {
                 _logger.InfoFormat("Migration '{0}' completed.", migrationLogName);
             }, migration => migration.GetType().Name);
 
-            _logger.DebugFormat("Rebuilding all caches.");
-            _context.ContentService.RePublishAll();
+            _logger.DebugFormat("Refreshing XML cache.");
             _context.RefreshContent();
 
             RunCompleted(this, new MigrationRunEventArgs(_context));
