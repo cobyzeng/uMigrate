@@ -23,6 +23,11 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         [NotNull] protected IMigrationContext Context { get; private set; }
         [NotNull]
+        protected IServiceContext Services {
+            get { return Context.Services; }
+        }
+
+        [NotNull]
         protected IMigrationLogger Logger {
             // ReSharper disable once AssignNullToNotNullAttribute
             get { return Context.Logger; }

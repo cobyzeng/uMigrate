@@ -11,7 +11,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
         private string _lastAddedPropertyGroupName;
 
         public ContentTypeSetSyntax(IMigrationContext context, [CanBeNull] IReadOnlyList<IContentType> contentTypes = null)
-            : base(context, () => contentTypes ?? context.ContentTypeService.GetAllContentTypes().AsReadOnlyList())
+            : base(context, () => contentTypes ?? context.Services.ContentTypeService.GetAllContentTypes().AsReadOnlyList())
         {
         }
 
@@ -34,7 +34,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         private IContentTypeSetSyntax AddInternal(int parentId, [CanBeNull] string parentName, string alias, params Action<IContentType>[] setups) {
-            var contentTypes = Context.ContentTypeService.GetContentTypeChildren(parentId);
+            var contentTypes = Services.ContentTypeService.GetContentTypeChildren(parentId);
             var contentType = contentTypes.FirstOrDefault(t => t.Alias == alias);
             var isNew = false;
             if (contentType == null) {
@@ -49,7 +49,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
                 setup(contentType);
             }
 
-            Context.ContentTypeService.Save(contentType);
+            Services.ContentTypeService.Save(contentType);
             Logger.Log("ContentType: {0} '{1}'{2}.", isNew ? "added" : "updated", contentType.Name, parentName != null ? " under " + parentName : "");
             return NewSet(new[] { contentType });
         }
@@ -76,7 +76,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         public IContentTypeSetSyntax AllowUnder(string otherContentTypeAlias) {
-            var otherContentType = Context.ContentTypeService.GetContentType(otherContentTypeAlias);
+            var otherContentType = Services.ContentTypeService.GetContentType(otherContentTypeAlias);
             Ensure.That(otherContentType != null, "Content type '{0}' was not found.", otherContentTypeAlias);
 
             return AllowUnder(NewSet(new[] { otherContentType }));
@@ -152,7 +152,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
 
         public IContentTypeSetSyntax AddProperty(string propertyAlias, string dataTypeName, string propertyGroupName = null, params Action<PropertyType>[] setups) {
-            var dataType = Context.DataTypeService.GetAllDataTypeDefinitions().SingleOrDefault(t => t.Name == dataTypeName);
+            var dataType = Services.DataTypeService.GetAllDataTypeDefinitions().SingleOrDefault(t => t.Name == dataTypeName);
             Ensure.That(dataType != null, "Data type '{0}' was not found.", dataTypeName);
 
             return AddProperty(propertyAlias, dataType, propertyGroupName, setups);
@@ -230,7 +230,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
                     return;
 
                 properties.MigrateEach(p => change(p, contentType));
-                Context.ContentTypeService.Save(contentType);
+                Services.ContentTypeService.Save(contentType);
             });
 
             return this;
@@ -255,13 +255,13 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         private void ChangeProperty<TFrom, TTo>(IContentType contentType, string propertyAlias, Action<PropertyType> change, Func<TFrom, TTo> convert) {
             var oldProperty = EnsureProperty(contentType, propertyAlias);
-            var newProperty = oldProperty.CloneUsing(Context.DataTypeService);
+            var newProperty = oldProperty.CloneUsing(Services.DataTypeService);
             change(newProperty);
 
             if (oldProperty.Alias == newProperty.Alias)
                 oldProperty.Alias += "Old" + DateTime.Now.ToString("yyyyMMddHHmmss");
 
-            Context.ContentTypeService.Save(contentType);
+            Services.ContentTypeService.Save(contentType);
             ChangeContents(contentType, c => true, c => {
                 var oldValue = c.GetValue<TFrom>(oldProperty.Alias);
                 var newValue = convert(oldValue);
@@ -269,7 +269,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             });
             
             contentType.RemovePropertyType(oldProperty.Alias);
-            Context.ContentTypeService.Save(contentType);
+            Services.ContentTypeService.Save(contentType);
         }
 
         public IContentTypeSetSyntax MoveProperty(string propertyAlias, string newPropertyGroupName) {
@@ -305,7 +305,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         public IContentTypeSetSyntax Change(Action<IContentType> change) {
             ChangeWithManualSave(change);
-            Context.ContentTypeService.Save(Objects);
+            Services.ContentTypeService.Save(Objects);
             Context.ClearCaches();
             return this;
         }
@@ -336,14 +336,14 @@ namespace uMigrate.Internal.SyntaxImplementations {
             var current = Objects;
             while (current.Count > 0) {
                 newTypes.AddRange(current);
-                current = current.SelectMany(t => Context.ContentTypeService.GetContentTypeChildren(t.Id)).ToArray();
+                current = current.SelectMany(t => Services.ContentTypeService.GetContentTypeChildren(t.Id)).ToArray();
             }
 
             return NewSet(newTypes);
         }
 
         public IEnumerable<IContent> GetAllContents() {
-            return Objects.SelectMany(type => Context.ContentService.GetContentOfContentType(type.Id));
+            return Objects.SelectMany(type => Services.ContentService.GetContentOfContentType(type.Id));
         }
 
         public IContentTypeSetSyntax ChangeContents(Func<IContent, bool> filter, Action<IContent> change) {
@@ -351,10 +351,10 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         private void ChangeContents(IContentType contentType, Func<IContent, bool> filter, Action<IContent> change) {
-            var contents = Context.ContentService.GetContentOfContentType(contentType.Id).Where(filter);
+            var contents = Services.ContentService.GetContentOfContentType(contentType.Id).Where(filter);
             contents.MigrateEach(c => {
                 change(c);
-                Context.ContentService.SaveThenPublishIfPublished(c);
+                Services.ContentService.SaveThenPublishIfPublished(c);
             });
         }
 

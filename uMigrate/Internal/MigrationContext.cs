@@ -11,18 +11,15 @@ using Umbraco.Core.Services;
 
 namespace uMigrate.Internal {
     public class MigrationContext : IMigrationContext {
-        [NotNull]
-        private readonly ServiceContext _services;
-
         public MigrationContext(
-            [NotNull] ServiceContext services,
+            [NotNull] IServiceContext services,
             [NotNull] UmbracoDatabase database,
             [NotNull] IMigrationRecordRepository migrationRecords,
             [CanBeNull] IMigrationLogger logger = null
         ) {
-            _services = services;
-            Database = database;
-            MigrationRecords = migrationRecords;
+            Services = Argument.NotNull("services", services);
+            Database = Argument.NotNull("database", database);
+            MigrationRecords = Argument.NotNull("migrationRecords", migrationRecords);
             Logger = logger;
         }
 
@@ -55,33 +52,10 @@ namespace uMigrate.Internal {
         public UmbracoDatabase Database { get; private set; }
         public IMigrationRecordRepository MigrationRecords { get; private set; }
         public IMigrationLogger Logger { get; private set; }
-
-        public IContentService ContentService {
-            get { return _services.ContentService; }
-        }
-
-        public IContentTypeService ContentTypeService {
-            get { return _services.ContentTypeService; }
-        }
-
-        public IDataTypeService DataTypeService {
-            get { return _services.DataTypeService; }
-        }
-
-        public IFileService FileService {
-            get { return _services.FileService; }
-        }
-
-        public IMediaService MediaService {
-            get { return _services.MediaService; }
-        }
-
-        public IUserService UserService {
-            get { return _services.UserService; }
-        }
+        public IServiceContext Services { get; private set; }
 
         public IMigrationContext WithLogger(IMigrationLogger logger) {
-            return new MigrationContext(_services, Database, MigrationRecords, logger);
+            return new MigrationContext(Services, Database, MigrationRecords, logger);
         }
     }
 }

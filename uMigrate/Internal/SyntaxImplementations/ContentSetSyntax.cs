@@ -7,14 +7,14 @@ using uMigrate.Fluent;
 namespace uMigrate.Internal.SyntaxImplementations {
     public class ContentSetSyntax : SetSyntaxBase<IContent, IContentSetSyntax, IContentFilteredSetSyntax>, IContentSetSyntax {
         public ContentSetSyntax([NotNull] IMigrationContext context, [CanBeNull] IReadOnlyList<IContent> contents = null)
-            : base(context, () => contents ?? context.ContentService.GetDescendants(-1).AsReadOnlyList()) {
+            : base(context, () => contents ?? context.Services.ContentService.GetDescendants(-1).AsReadOnlyList()) {
         }
 
         public IContentSetSyntax Add(string name, string contentTypeAlias) {
             Argument.NotNullOrEmpty("name", name);
             Argument.NotNullOrEmpty("contentTypeAlias", contentTypeAlias);
 
-            var contentType = Context.ContentTypeService.GetContentType(contentTypeAlias);
+            var contentType = Services.ContentTypeService.GetContentType(contentTypeAlias);
             Ensure.That(contentType != null, "Could not find content type '{0}'.", contentTypeAlias);
             return Add(name, contentType);
         }
@@ -24,7 +24,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Argument.NotNull("contentType", contentType);
 
             var content = new Content(name, -1, contentType);
-            Context.ContentService.SaveAndPublishWithStatus(content);
+            Services.ContentService.SaveAndPublishWithStatus(content);
 
             Logger.Log("Content: added '{0}'.", content.Name);
             return NewSet(new[] { content });

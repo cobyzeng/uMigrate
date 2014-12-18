@@ -10,7 +10,7 @@ using uMigrate.Fluent;
 namespace uMigrate.Internal.SyntaxImplementations {
     public class DataTypeSetSyntax : SetSyntaxBase<IDataTypeDefinition, IDataTypeSetSyntax, IDataTypeFilteredSetSyntax>, IDataTypeSetSyntax {
         public DataTypeSetSyntax([NotNull] IMigrationContext context, [CanBeNull] IReadOnlyList<IDataTypeDefinition> types = null)
-            : base(context, () => types ?? context.DataTypeService.GetAllDataTypeDefinitions().AsReadOnlyList()) 
+            : base(context, () => types ?? context.Services.DataTypeService.GetAllDataTypeDefinitions().AsReadOnlyList()) 
         {
         }
 
@@ -26,7 +26,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Argument.NotNullOrEmpty("name", name);
             Argument.NotNullOrEmpty("editorAlias", editorAlias);
 
-            var all = Context.DataTypeService.GetAllDataTypeDefinitions();
+            var all = Services.DataTypeService.GetAllDataTypeDefinitions();
             var existing = all.SingleOrDefault(t => t.Name == name);
             if (existing != null) {
                 Logger.Log("DataType: '{0}' already exists, skipping.", name);
@@ -37,7 +37,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             if (key != null)
                 dataType.Key = key.Value;
 
-            Context.DataTypeService.Save(dataType);
+            Services.DataTypeService.Save(dataType);
             Logger.Log("DataType: added '{0}' (key '{1}'), using editor '{2}'.", name, key, editorAlias);
             return NewSet(dataType);
         }
@@ -88,10 +88,10 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Argument.NotNull("change", change);
 
             return ChangeWithManualSave(dataType => {
-                var preValues = Context.DataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
+                var preValues = Services.DataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
                 change(preValues, dataType);
 
-                Context.DataTypeService.SavePreValues(dataType.Id, preValues.PreValuesAsDictionary);
+                Services.DataTypeService.SavePreValues(dataType.Id, preValues.PreValuesAsDictionary);
                 Context.ClearCaches(); // nuclear option, but sometimes cache is incorrect if values are added quickly enough
             });
         }
@@ -101,7 +101,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Argument.NotNull("change", change);
 
             return ChangeWithManualSave(dataType => {
-                var preValues = Context.DataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
+                var preValues = Services.DataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
                 var preValue = preValues.PreValuesAsDictionary.GetValueOrDefault(key);
                 Ensure.That(
                     preValue != null,
@@ -110,7 +110,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
                 );
                 change(preValue);
 
-                Context.DataTypeService.SavePreValues(dataType.Id, preValues.PreValuesAsDictionary);
+                Services.DataTypeService.SavePreValues(dataType.Id, preValues.PreValuesAsDictionary);
             });
         }
 
@@ -118,7 +118,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Argument.NotNull("change", change);
 
             var dataTypeIds = new HashSet<int>(Objects.Select(t => t.Id));
-            var allContentTypes = Context.ContentTypeService.GetAllContentTypes();
+            var allContentTypes = Services.ContentTypeService.GetAllContentTypes();
             allContentTypes.MigrateEach(contentType => {
                 var relevantProperties = contentType.PropertyTypes.Where(p => dataTypeIds.Contains(p.DataTypeDefinitionId)).ToArray();
                 if (!relevantProperties.Any())
@@ -131,7 +131,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         public IDataTypeSetSyntax Delete() {
             foreach (var dataTypeDefinition in Objects){
-                Context.DataTypeService.Delete(dataTypeDefinition);
+                Services.DataTypeService.Delete(dataTypeDefinition);
                 Logger.Log("DataType: deleted '{0}' (key '{1}').", 
                     dataTypeDefinition.Name, 
                     dataTypeDefinition.Key);
@@ -141,13 +141,13 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         private void ChangePropertyValues<TFrom, TTo>(IContentType contentType, PropertyType[] properties, Func<TFrom, TTo> change) {
-            var contents = Context.ContentService.GetContentOfContentType(contentType.Id);
+            var contents = Services.ContentService.GetContentOfContentType(contentType.Id);
             contents.MigrateEach(c => {
                 properties.MigrateEach(p => {
                     var value = c.GetValue<TFrom>(p.Alias);
                     c.SetValue(p.Alias, change(value));
                 });
-                Context.ContentService.SaveThenPublishIfPublished(c);
+                Services.ContentService.SaveThenPublishIfPublished(c);
             });
         }
     }

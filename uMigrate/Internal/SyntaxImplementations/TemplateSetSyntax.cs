@@ -10,7 +10,7 @@ using uMigrate.Fluent;
 namespace uMigrate.Internal.SyntaxImplementations {
     public class TemplateSetSyntax : SetSyntaxBase<ITemplate, ITemplateSetSyntax, ITemplateFilteredSetSyntax>, ITemplateSetSyntax {
         public TemplateSetSyntax(IMigrationContext context, [CanBeNull] IReadOnlyList<ITemplate> templates = null)
-            : base(context, () => templates ?? context.FileService.GetTemplates().ToArray())
+            : base(context, () => templates ?? context.Services.FileService.GetTemplates().ToArray())
         {
         }
 
@@ -26,7 +26,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
             var content = fileSystem.ReadAllText(fileName);
 
-            var template = Context.FileService.GetTemplate(alias);
+            var template = Services.FileService.GetTemplate(alias);
             if (template == null) {
                 template = new Template(filePath, name, alias);
             }
@@ -40,7 +40,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             }
 
             template.Content = content;
-            Context.FileService.SaveTemplate(template);
+            Services.FileService.SaveTemplate(template);
             Logger.Log("Template: added '{0}' (alias: '{1}', {2}).", name, alias, engine);
             return NewSet(template);
         }
@@ -56,30 +56,30 @@ namespace uMigrate.Internal.SyntaxImplementations {
         public ITemplateSetSyntax Delete(string alias, bool canDeleteContentVersions = false) {
             Argument.NotNullOrEmpty("alias", alias);
 
-            var template = Context.FileService.GetTemplate(alias);
+            var template = Services.FileService.GetTemplate(alias);
             if (template == null) {
                 Logger.Log("Template: '{0}' does not exist, ignored delete request.", alias);
                 return this;
             }
 
             RemoveAllReferencesToTemplate(template, canDeleteContentVersions);
-            Context.FileService.DeleteTemplate(alias);
+            Services.FileService.DeleteTemplate(alias);
             Logger.Log("Template: deleted '{0}'.", alias);
             return this;
         }
 
         // probably fixed by http://issues.umbraco.org/issue/U4-2356
         private void RemoveAllReferencesToTemplate(ITemplate template, bool canDeleteContentVersions) {
-            var contentTypes = Context.ContentTypeService.GetAllContentTypes()
+            var contentTypes = Services.ContentTypeService.GetAllContentTypes()
                 .Where(c => c.AllowedTemplates.Any(t => t.Alias == template.Alias))
                 .ToArray();
 
             contentTypes.MigrateEach(contentType => {
                 contentType.RemoveTemplate(template);
-                Context.ContentTypeService.Save(contentType);
+                Services.ContentTypeService.Save(contentType);
                 Logger.Log("ContentType: '{0}', removed template '{1}'.", contentType.Name, template.Alias);
 
-                var contents = Context.ContentService.GetContentOfContentType(contentType.Id).ToArray();
+                var contents = Services.ContentService.GetContentOfContentType(contentType.Id).ToArray();
                 contents.MigrateEach(c => RemoveAllReferencesToTemplate(c, template, canDeleteContentVersions));
             });
         }
@@ -87,12 +87,12 @@ namespace uMigrate.Internal.SyntaxImplementations {
         private void RemoveAllReferencesToTemplate(IContent content, ITemplate template, bool canDeleteContentVersions) {
             if (content.Template != null && content.Template.Alias == template.Alias) {
                 content.Template = null;
-                Context.ContentService.SaveThenPublishIfPublished(content);
+                Services.ContentService.SaveThenPublishIfPublished(content);
                 Logger.Log("Content: '{0}' (id {1}), set default template to none.", content.Name, content.Id);
             }
 
-            var reloaded = Context.ContentService.GetById(content.Id);
-            var versions = Context.ContentService.GetVersions(reloaded.Id).ToArray();
+            var reloaded = Services.ContentService.GetById(content.Id);
+            var versions = Services.ContentService.GetVersions(reloaded.Id).ToArray();
             versions.MigrateEach(version => {
                 if (version.Version == reloaded.Version)
                     return;
@@ -108,7 +108,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
                     throw new UmbracoMigrationException(message);
                 }
 
-                Context.ContentService.DeleteVersion(version.Id, version.Version, false);
+                Services.ContentService.DeleteVersion(version.Id, version.Version, false);
                 Logger.Log("Content: '{0}' (id {1}), deleted version {2}.", content.Name, content.Id, version.Version);
             }, v => string.Format("version '{0}' of content '{1}' (id {2})", v.Version, content.Name, content.Id));
         }
@@ -117,7 +117,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Argument.NotNull("action", action);
 
             ChangeWithManualSave(action);
-            Context.FileService.SaveTemplate(Objects);
+            Services.FileService.SaveTemplate(Objects);
             return this;
         }
 

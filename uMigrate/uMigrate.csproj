@@ -231,6 +231,7 @@
     <Compile Include="Infrastructure\MigrationRunStartingEventArgs.cs" />
     <Compile Include="Internal\IMigrationTypeProvider.cs" />
     <Compile Include="Internal\AppDomainAssemblyMigrationTypeProvider.cs" />
+    <Compile Include="Internal\ServiceContextWrapper.cs" />
     <Compile Include="Internal\SyntaxImplementations\ContentSetSyntax.cs" />
     <Compile Include="Fluent\IDataTypeFilteredSetSyntax.cs" />
     <Compile Include="Fluent\IDataTypeSetSyntax.cs" />
@@ -253,6 +254,7 @@
     <Compile Include="Internal\SyntaxImplementations\SetSyntaxBase.cs" />
     <Compile Include="IMigrationContext.cs" />
     <Compile Include="Internal\IMigrationResolver.cs" />
+    <Compile Include="IServiceContext.cs" />
     <Compile Include="IUmbracoMigration.cs" />
     <Compile Include="Infrastructure\MigrationApplicationEventHandler.cs" />
     <Compile Include="Internal\MigrationContext.cs" />

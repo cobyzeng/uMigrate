@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
-using Umbraco.Core.Models;
 using uMigrate.Fluent;
 using uMigrate.Internal;
 using uMigrate.Internal.SyntaxImplementations;
@@ -15,8 +14,7 @@ namespace uMigrate {
             Run();
         }
 
-        [PublicAPI]
-        protected IMigrationContext Context { get; private set; }
+        [PublicAPI] [NotNull] protected IMigrationContext Context { get; private set; }
 
         public virtual string Version {
             get { return GetVersionFromTypeName(); }
@@ -35,7 +33,7 @@ namespace uMigrate {
 
         [PublicAPI]
         public IContentTypeFilteredSetSyntax ContentType(string alias) {
-            var contentType = Context.ContentTypeService.GetContentType(alias);
+            var contentType = Context.Services.ContentTypeService.GetContentType(alias);
             Ensure.That(contentType != null, "Content type '{0}' was not found.", alias);
             return new ContentTypeSetSyntax(Context, new[] { contentType });
         }

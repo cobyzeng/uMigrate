@@ -2,18 +2,12 @@
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
 using uMigrate.Internal;
 
 namespace uMigrate {
+    [PublicAPI]
     public interface IMigrationContext {
-        [NotNull] IContentService ContentService { get; }
-        [NotNull] IContentTypeService ContentTypeService { get; }
-        [NotNull] IDataTypeService DataTypeService { get; }
-        [NotNull] IFileService FileService { get; }
-        [NotNull] IMediaService MediaService { get; }
-        [NotNull] IUserService UserService { get; } 
-
+        [PublicAPI] [NotNull] IServiceContext Services { get; }
         [NotNull] IFileSystem GetFileSystem(string rootPath);
 
         // this one is not mockable at the moment, but we may not want to use it in the future anyway

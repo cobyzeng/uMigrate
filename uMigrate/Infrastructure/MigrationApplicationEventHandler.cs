@@ -29,7 +29,11 @@ namespace uMigrate.Infrastructure {
             var logRepository = new DatabaseMigrationRecordRepository(applicationContext.DatabaseContext.Database);
 
             var migrationResolver = new MigrationResolver(new AppDomainAssemblyMigrationTypeProvider());
-            var context = new MigrationContext(applicationContext.Services, applicationContext.DatabaseContext.Database, logRepository);
+            var context = new MigrationContext(
+                new ServiceContextWrapper(applicationContext.Services),
+                applicationContext.DatabaseContext.Database,
+                logRepository
+            );
             var logger = LogManager.GetLogger(typeof(UmbracoMigrator));
             var migrator = new UmbracoMigrator(migrationResolver, context, logger);
 
