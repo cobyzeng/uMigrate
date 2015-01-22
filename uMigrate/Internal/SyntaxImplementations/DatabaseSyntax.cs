@@ -29,6 +29,8 @@ namespace uMigrate.Internal.SyntaxImplementations {
                 foreach (var part in Regex.Split(script, @"[\r\n]+\s*GO\s*[\r\n]+", RegexOptions.IgnoreCase)) {
                     try {
                         using (var command = _database.CreateCommand(_database.Connection, "")) {
+                            // might take quite a bit of time on a large instance
+                            command.CommandTimeout = TimeSpan.FromDays(1).Seconds;
                             command.CommandText = part;
                             command.CommandType = CommandType.Text;
                             command.ExecuteNonQuery();
