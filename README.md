@@ -56,6 +56,10 @@ If you need a proper log for that, use `Logger` provided by `UmbracoMigrationBas
 * It is potentially possible to mock migration dependencies to unit-test migrations, but it is not a final design.  
 Currently the best choice is to do integration tests.
 
+### Other
+
+More detailed documentation might be available at the [Wiki](../../wiki).
+
 ## Contributing
 
 Contributions are welcome, though for feature requests please create an issue first
