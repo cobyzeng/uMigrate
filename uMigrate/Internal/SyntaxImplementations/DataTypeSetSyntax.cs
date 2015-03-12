@@ -46,6 +46,9 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Argument.NotNull("preValues", preValues);
 
             return ChangePreValues((collection, dataType) => {
+                // Clearing all existing prevalues here as the intention when running this method should be replacing all values with a given set.
+                collection.PreValuesAsDictionary = new Dictionary<string, PreValue>();
+
                 foreach (var pair in preValues.ToDictionary()) {
                     var value = pair.Value as string ?? JsonConvert.SerializeObject(pair.Value, Formatting.None);
                     SetPreValueInternal(dataType, collection, pair.Key, value);
@@ -61,7 +64,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         private void SetPreValueInternal(IDataTypeDefinition dataType, PreValueCollection preValues, string name, string newValue) {
-            var dictionary = preValues.PreValuesAsDictionary;
+            var dictionary = preValues.FormatAsDictionary();
             var existing = dictionary.GetValueOrDefault(name);
             if (existing != null) {
                 var oldValue = existing.Value;
