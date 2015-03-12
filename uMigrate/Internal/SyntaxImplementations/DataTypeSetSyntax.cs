@@ -42,12 +42,12 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return NewSet(dataType);
         }
 
-        public IDataTypeSetSyntax SetPreValues(object preValues) {
+        public IDataTypeSetSyntax SetPreValues(object preValues, bool resetValues) {
             Argument.NotNull("preValues", preValues);
 
             return ChangePreValues((collection, dataType) => {
-                // Clearing all existing prevalues here as the intention when running this method should be replacing all values with a given set.
-                collection.PreValuesAsDictionary = new Dictionary<string, PreValue>();
+                if (resetValues)
+                    collection.PreValuesAsDictionary = new Dictionary<string, PreValue>();
 
                 foreach (var pair in preValues.ToDictionary()) {
                     var value = pair.Value as string ?? JsonConvert.SerializeObject(pair.Value, Formatting.None);
