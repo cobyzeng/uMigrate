@@ -9,7 +9,7 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IDataTypeFilteredSetSyntax WhereEditorAliasIs([NotNull] string alias);
 
         [PublicAPI, NotNull] IDataTypeSetSyntax SetPreValue([NotNull] string name, [NotNull] string value);
-        [PublicAPI, NotNull] IDataTypeSetSyntax SetPreValues([NotNull] object preValues, bool resetValues = false);
+        [PublicAPI, NotNull] IDataTypeSetSyntax SetPreValues([NotNull] object preValues, bool overwrite = false);
 
         [PublicAPI, NotNull] IDataTypeSetSyntax ChangePreValues([NotNull] Action<PreValueCollection> change);
         [PublicAPI, NotNull] IDataTypeSetSyntax ChangePreValues([NotNull] Action<PreValueCollection, IDataTypeDefinition> change);

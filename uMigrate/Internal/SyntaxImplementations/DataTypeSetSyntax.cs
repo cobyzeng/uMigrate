@@ -42,11 +42,11 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return NewSet(dataType);
         }
 
-        public IDataTypeSetSyntax SetPreValues(object preValues, bool resetValues) {
+        public IDataTypeSetSyntax SetPreValues(object preValues, bool overwrite = false) {
             Argument.NotNull("preValues", preValues);
 
             return ChangePreValues((collection, dataType) => {
-                if (resetValues)
+                if (overwrite)
                     collection.PreValuesAsDictionary = new Dictionary<string, PreValue>();
 
                 foreach (var pair in preValues.ToDictionary()) {
