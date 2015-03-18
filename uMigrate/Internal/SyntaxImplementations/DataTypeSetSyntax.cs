@@ -42,10 +42,13 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return NewSet(dataType);
         }
 
-        public IDataTypeSetSyntax SetPreValues(object preValues) {
+        public IDataTypeSetSyntax SetPreValues(object preValues, bool overwrite = false) {
             Argument.NotNull("preValues", preValues);
 
             return ChangePreValues((collection, dataType) => {
+                if (overwrite)
+                    collection.PreValuesAsDictionary = new Dictionary<string, PreValue>();
+
                 foreach (var pair in preValues.ToDictionary()) {
                     var value = pair.Value as string ?? JsonConvert.SerializeObject(pair.Value, Formatting.None);
                     SetPreValueInternal(dataType, collection, pair.Key, value);
@@ -61,7 +64,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         private void SetPreValueInternal(IDataTypeDefinition dataType, PreValueCollection preValues, string name, string newValue) {
-            var dictionary = preValues.PreValuesAsDictionary;
+            var dictionary = preValues.FormatAsDictionary();
             var existing = dictionary.GetValueOrDefault(name);
             if (existing != null) {
                 var oldValue = existing.Value;
