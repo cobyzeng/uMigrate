@@ -1,5 +1,7 @@
 # uMigrate
 
+![Build Status](https://ci.appveyor.com/api/projects/status/github/affinityid/umigrate?svg=true&branch=MASTER&passingText=MASTER%20BUILD%20OK&failingText=MASTER%20BUILD%20FAILED&pendingText=MASTER%20BUILD%20QUEUED)
+
 A code-first migration framework for Umbraco (7.1.4+) started at [Affinity ID](http://www.affinityid.co.nz).  
 You can use it to add/change/remove Document Types, Data Types, etc.
 
