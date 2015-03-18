@@ -9,5 +9,5 @@ deploy:
   provider: NuGet
   server: https://staging.nuget.org/
   api_key:
-    secure: K+acArHRTR2l7LuM23TN9Rd1LK/R+cw7P35Dkfu3Q479iGHyJ/XNO/UZf9OeCGyz
+    secure: YMf0LrMxf9FnpDd8V0neIaqzMkHc83JEGF7wh5/aYlhA6IZ9b9slC8lZoxvxv5Vf
   artifact: /.*\.nupkg/
