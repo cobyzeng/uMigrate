@@ -50,7 +50,7 @@ So `ContentTypes.AddProperty("Test")` would add property "Test" to all content t
 
 ### Logging
 
-* uMigrate tries to produce a good log, but it is not avle to detect changes made by `Change*` methods.  
+* uMigrate tries to produce a good log, but it is not able to detect changes made by `Change*` methods.  
 If you need a proper log for that, use `Logger` provided by `UmbracoMigrationBase`.
 
 ### Testing
