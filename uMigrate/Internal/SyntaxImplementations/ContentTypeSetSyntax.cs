@@ -56,7 +56,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         public IContentTypeSetSyntax AllowUnder(IContentTypeFilteredSetSyntax otherContentTypes) {
             otherContentTypes.Change(other => {
-                var allowed = other.AllowedContentTypes.AsList();
+                var allowed = other.AllowedContentTypes.AsWriteableCollection();
                 ChangeWithManualSave(c => {
                     if (allowed.Any(a => a.Id.Value == c.Id))
                         return;
@@ -312,7 +312,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         public IContentTypeSetSyntax AllowTemplate(ITemplate template) {
             return Change(c => {
-                var list = c.AllowedTemplates.AsCollection();
+                var list = c.AllowedTemplates.AsWriteableCollection();
                 list.Add(template);
                 c.AllowedTemplates = list;
 

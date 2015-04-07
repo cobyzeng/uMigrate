@@ -42,16 +42,17 @@ namespace uMigrate.Internal {
             return found ? value : default(TValue);
         }
 
-        internal static ICollection<T> AsCollection<T>(this IEnumerable<T> items) {
-            return (items as ICollection<T>) ?? items.ToList();
-        }
+        internal static ICollection<T> AsWriteableCollection<T>(this IEnumerable<T> items) {
+            var collection = items as ICollection<T>;
+            if (collection != null && !collection.IsReadOnly)
+                return collection;
 
-        internal static IList<T> AsList<T>(this IEnumerable<T> items) {
-            return (items as IList<T>) ?? items.ToList();
+            return items.ToList();
         }
 
         internal static IReadOnlyList<T> AsReadOnlyList<T>(this IEnumerable<T> items) {
-            return (items as IReadOnlyList<T>) ?? new ReadOnlyCollection<T>(items.AsList());
+            return (items as IReadOnlyList<T>)
+                ?? new ReadOnlyCollection<T>((items as IList<T> ?? items.ToList()));
         }
     }
 }
