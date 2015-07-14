@@ -25,24 +25,36 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         public IContentTypeSetSyntax Add(string alias, params Action<IContentType>[] setups) {
             Argument.NotNull("alias", alias);
-            return AddInternal(-1, null, alias, setups);
+            return AddInternal(null, null, alias, setups);
         }
 
         public IContentTypeSetSyntax AddChild(string alias, params Action<IContentType>[] setups) {
             Argument.NotNull("alias", alias);
-            return ChangeWithManualSave(c => AddInternal(c.Id, c.Name, alias, setups));
+            return ChangeWithManualSave(c => AddInternal(c, c.Name, alias, setups));
         }
 
-        private IContentTypeSetSyntax AddInternal(int parentId, [CanBeNull] string parentName, string alias, params Action<IContentType>[] setups) {
-            var contentTypes = Services.ContentTypeService.GetContentTypeChildren(parentId);
+        private IContentTypeSetSyntax AddInternal(IContentType parent, [CanBeNull] string parentName, string alias, params Action<IContentType>[] setups) {
+            var contentTypes = Services.ContentTypeService.GetContentTypeChildren(parent==null?-1:parent.Id);
             var contentType = contentTypes.FirstOrDefault(t => t.Alias == alias);
             var isNew = false;
             if (contentType == null) {
-                contentType = new ContentType(parentId) {
-                    Alias = alias,
-                    Name = alias
-                };
-                isNew = true;
+	            if (parent == null)
+	            {
+					contentType = new ContentType(-1)
+					{
+						Alias = alias,
+						Name = alias
+					};
+	            }
+	            else
+	            {
+		            contentType = new ContentType(parent)
+		            {
+			            Alias = alias,
+			            Name = alias
+		            };
+	            }
+	            isNew = true;
             }
 
             foreach (var setup in setups) {
