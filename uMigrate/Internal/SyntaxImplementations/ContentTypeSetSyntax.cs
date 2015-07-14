@@ -34,27 +34,16 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         private IContentTypeSetSyntax AddInternal(IContentType parent, [CanBeNull] string parentName, string alias, params Action<IContentType>[] setups) {
-            var contentTypes = Services.ContentTypeService.GetContentTypeChildren(parent==null?-1:parent.Id);
+            var contentTypes = Services.ContentTypeService.GetContentTypeChildren(parent == null ? -1 : parent.Id);
             var contentType = contentTypes.FirstOrDefault(t => t.Alias == alias);
             var isNew = false;
             if (contentType == null) {
-	            if (parent == null)
-	            {
-					contentType = new ContentType(-1)
-					{
-						Alias = alias,
-						Name = alias
-					};
-	            }
-	            else
-	            {
-		            contentType = new ContentType(parent)
-		            {
-			            Alias = alias,
-			            Name = alias
-		            };
-	            }
-	            isNew = true;
+	            contentType = parent != null
+                            ? new ContentType(parent)
+                            : new ContentType(-1);
+                contentType.Alias = alias;
+                contentType.Name = alias;
+                isNew = true;
             }
 
             foreach (var setup in setups) {
