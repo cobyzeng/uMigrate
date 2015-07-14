@@ -8,7 +8,9 @@
     <owners>$author$</owners>
     <description>$description$</description>
     <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>
+      0.9.4 Fixed issue where children added by AddChild didn't have inherited properties (thanks @Myster).
+    </releaseNotes>
     <tags>Umbraco migrations</tags>
   </metadata>
 </package>
