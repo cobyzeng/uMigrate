@@ -23,7 +23,8 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IContentTypeSetSyntax ChangeProperty([NotNull] string propertyAlias, [NotNull] Action<PropertyType, IContentType> change);
         [PublicAPI, NotNull] IContentTypeSetSyntax ChangeProperty<TFrom, TTo>([NotNull] string propertyAlias, [NotNull] Action<PropertyType> change, [NotNull] Func<TFrom, TTo> convert);
         [PublicAPI, NotNull] IContentTypeSetSyntax MoveProperty([NotNull] string propertyAlias, [NotNull] string newPropertyGroupName);
-        [PublicAPI, NotNull] IContentTypeSetSyntax SortProperties([NotNull] string propertyGroupName, [NotNull] Func<PropertyType, PropertyType, int> compare);
+        [PublicAPI, NotNull] IContentTypeSetSyntax SortProperties([CanBeNull] string propertyGroupName, [NotNull] Func<PropertyType, PropertyType, int> compare);
+        [PublicAPI, NotNull] IContentTypeSetSyntax SortProperties([CanBeNull] string propertyGroupName, params string[] sortedPropertyAliases);
 
         [PublicAPI, NotNull] IContentTypeSetSyntax Change([NotNull] Action<IContentType> change);
 

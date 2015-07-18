@@ -295,13 +295,33 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
                 for (var i = 0; i < propertiesSorted.Count; i++) {
                     var property = propertiesSorted[i];
-                    if (property.SortOrder == i)
-                        continue;
-
-                    Logger.Log("ContentType: '{0}', property '{1}', changing sort order: {2} => {3}.", contentType.Name, property.Name, property.SortOrder, i);
-                    property.SortOrder = i;
+                    SetSortOrderIfRequired(property, i, contentType);
                 }
             });
+        }
+
+        public IContentTypeSetSyntax SortProperties(string propertyGroupName, params string[] sortedPropertyAliases) {
+            return Change(contentType => {
+                for (var i = 0; i < sortedPropertyAliases.Length; i++) {
+                    var alias = sortedPropertyAliases[i];
+                    var property = contentType.PropertyTypes.FirstOrDefault(p => p.Alias == alias);
+                    Ensure.That(
+                        property != null,
+                        "Property '{0}' was not found on '{1}'. Available properties: '{2}'.",
+                        alias, contentType.Name, string.Join("', '", contentType.PropertyTypes.Select(p => p.Alias).OrderBy(n => n))
+                    );
+
+                    SetSortOrderIfRequired(property, i, contentType);
+                }
+            });
+        }
+
+        private void SetSortOrderIfRequired(PropertyType property, int newSortOrder, IContentType contentType) {
+            if (property.SortOrder == newSortOrder)
+                return;
+
+            Logger.Log("ContentType: '{0}', property '{1}', changing sort order: {2} => {3}.", contentType.Name, property.Name, property.SortOrder, newSortOrder);
+            property.SortOrder = newSortOrder;
         }
 
         public IContentTypeSetSyntax Change(Action<IContentType> change) {
@@ -391,6 +411,14 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         [CanBeNull]
         private static PropertyGroup GetPropertyGroupOrNull(IContentType contentType, string propertyGroupName) {
+            if (propertyGroupName == null) {
+                return new PropertyGroup(new PropertyTypeCollection(
+                    contentType.PropertyTypes.Except(
+                        contentType.PropertyGroups.SelectMany(g => g.PropertyTypes)
+                    )
+                ));
+            }
+
             return contentType.PropertyGroups.SingleOrDefault(g => g.Name == propertyGroupName);
         }
 
