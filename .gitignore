@@ -5,5 +5,5 @@ packages/
 *.suo
 *.user
 _ReSharper.*
-
 /*.nupkg
+uMigrate.Tests.Integration/App_Data/

@@ -9,7 +9,7 @@ namespace uMigrate.Internal {
             return AppDomain.CurrentDomain.GetAssemblies()
                             .SelectMany(a => a.GetTypes())
                             .Where(baseType.IsAssignableFrom)
-                            .Where(t => !t.IsInterface && !t.IsAbstract);
+                            .Where(t => !t.IsInterface && !t.IsAbstract && !t.IsNestedPrivate);
         }
     }
 }

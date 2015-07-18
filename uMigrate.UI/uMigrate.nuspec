@@ -8,7 +8,10 @@
     <owners>$author$</owners>
     <description>Migration framework for Umbraco (Core+UI).</description>
     <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>
+      0.10.0 Support for other database engines (where supported by Umbraco), e.g. SQL CE.
+      0.9.4  Fixed issue where children added by AddChild didn't have inherited properties (thanks @Myster).
+    </releaseNotes>
     <tags>Umbraco migrations</tags>
     <dependencies>
       <dependency id="uMigrate.Core" version="$version$" />

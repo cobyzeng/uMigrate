@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ClientDependency.Core.Logging;
 using log4net;
 using Moq;
 using NUnit.Framework;

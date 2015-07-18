@@ -34,7 +34,7 @@ namespace uMigrate.Infrastructure {
             }
         }
 
-        public void RunInternal() {
+        protected void RunInternal() {
             _logger.Info("Migration run starting.");
 
             var runStartingArgs = new MigrationRunStartingEventArgs(_context);
