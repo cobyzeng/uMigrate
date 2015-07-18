@@ -34,5 +34,7 @@ namespace uMigrate.Fluent {
 
         [PublicAPI, NotNull] IEnumerable<IContent> GetAllContents();
         [PublicAPI, NotNull] IContentTypeSetSyntax ChangeContents([NotNull] Func<IContent, bool> filter, [NotNull] Action<IContent> change);
+
+        [PublicAPI, NotNull] void Delete();
     }
 }

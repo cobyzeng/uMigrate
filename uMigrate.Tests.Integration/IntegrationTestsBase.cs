@@ -37,8 +37,10 @@ namespace uMigrate.Tests.Integration {
 
         [TearDown]
         protected virtual void AfterEachTest() {
-            if (_application != null)
+            if (_application != null) {
                 _application.Stop();
+                ((IDisposable) _application.ApplicationContext).Dispose();
+            }
             _application = null;
             _migrator = null;
         }
@@ -64,7 +66,7 @@ namespace uMigrate.Tests.Integration {
             }
 
             public override string Version {
-                get { return "__TEST__"; }
+                get { return "Test-" + Guid.NewGuid().ToString("N"); }
             }
         }
     }

@@ -359,6 +359,26 @@ namespace uMigrate.Internal.SyntaxImplementations {
             });
         }
 
+        public IContentTypeSetSyntax Delete(string alias) {
+            Argument.NotNull("alias", alias);
+            var contentType = Services.ContentTypeService.GetContentType(alias);
+            if (contentType == null) {
+                Logger.Log("ContentType: '{0}' doesn't exist, no need to delete.", alias);
+                return this;
+            }
+
+            Services.ContentTypeService.Delete(contentType);
+            Logger.Log("ContentType: '{0}' deleted", contentType.Name);
+            return this;
+        }
+
+        public void Delete() {
+            ChangeWithManualSave(c => {
+                Services.ContentTypeService.Delete(c);
+                Logger.Log("ContentType: '{0}' deleted", c.Name);
+            });
+        }
+
         [NotNull]
         private static PropertyGroup EnsurePropertyGroup(IContentType contentType, string propertyGroupName) {
             var group = GetPropertyGroupOrNull(contentType, propertyGroupName);
