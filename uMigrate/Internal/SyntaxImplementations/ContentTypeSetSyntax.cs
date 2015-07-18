@@ -367,8 +367,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
                 return this;
             }
 
-            Services.ContentTypeService.Delete(contentType);
-            Logger.Log("ContentType: '{0}' deleted", contentType.Name);
+            NewSet(contentType).Delete();
             return this;
         }
 

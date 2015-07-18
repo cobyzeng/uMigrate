@@ -38,8 +38,17 @@ namespace uMigrate.Internal.SyntaxImplementations {
                 dataType.Key = key.Value;
 
             Services.DataTypeService.Save(dataType);
-            Logger.Log("DataType: added '{0}' (key '{1}'), using editor '{2}'.", name, key, editorAlias);
+            Logger.Log("DataType: '{0}' added (key '{1}'), using editor '{2}'.", name, key, editorAlias);
             return NewSet(dataType);
+        }
+
+        public IDataTypeSetSyntax SetEditorAlias(string alias) {
+            Argument.NotNull("alias", alias);
+            return ChangeWithManualSave(dataType => {
+                dataType.PropertyEditorAlias = alias;
+                Logger.Log("DataType: '{0}', set editor to '{1}'.", dataType.Name, alias);
+                Services.DataTypeService.Save(dataType);
+            });
         }
 
         public IDataTypeSetSyntax SetPreValues(object preValues, bool overwrite = false) {
@@ -132,15 +141,23 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return this;
         }
 
-        public IDataTypeSetSyntax Delete() {
-            foreach (var dataTypeDefinition in Objects){
-                Services.DataTypeService.Delete(dataTypeDefinition);
-                Logger.Log("DataType: deleted '{0}' (key '{1}').", 
-                    dataTypeDefinition.Name, 
-                    dataTypeDefinition.Key);
+        public IDataTypeSetSyntax Delete(string name) {
+            Argument.NotNull("name", name);
+            var dataType = Where(d => d.Name == name);
+            if (dataType.Objects.Count == 0) {
+                Logger.Log("DataType: '{0}' doesn't exist, no need to delete.", name);
+                return this;
             }
 
+            dataType.Delete();
             return this;
+        }
+
+        public void Delete() {
+            ChangeWithManualSave(dataType => {
+                Services.DataTypeService.Delete(dataType);
+                Logger.Log("DataType: '{0}' (key '{1}') deleted.", dataType.Name, dataType.Key);
+            });
         }
 
         private void ChangePropertyValues<TFrom, TTo>(IContentType contentType, PropertyType[] properties, Func<TFrom, TTo> change) {

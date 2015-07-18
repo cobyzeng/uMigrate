@@ -20,7 +20,7 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
-        public void Delete_RemovesContentByAlias_WhenCalledOnRootSetWithAlias() {
+        public void Delete_RemovesByAlias_WhenCalledOnRootSetWithAlias() {
             RunMigration(m => m.ContentTypes.Add("ToDelete"));
             RunMigration(m => m.ContentTypes.Delete("ToDelete"));
 
@@ -29,7 +29,7 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
-        public void Delete_RemovesAllMatchingContents_WhenCalledOnFileredSet() {
+        public void Delete_RemovesAllFiltered_WhenCalledOnFilteredSet() {
             RunMigration(m => m.ContentTypes.Add("ToDelete"));
             RunMigration(m => m.ContentTypes.Where(t => t.Alias == "ToDelete").Delete());
 

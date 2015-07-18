@@ -201,6 +201,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataTypeTests.cs" />
     <Compile Include="ContentTypeTests.cs" />
     <Compile Include="IntegrationTestsBase.cs" />
     <Compile Include="Internal\StubCacheRefresher.cs" />
