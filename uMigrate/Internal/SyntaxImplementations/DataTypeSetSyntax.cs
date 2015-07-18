@@ -129,14 +129,14 @@ namespace uMigrate.Internal.SyntaxImplementations {
         public IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>(Func<TFrom, TTo> change) {
             Argument.NotNull("change", change);
 
-            var dataTypeIds = new HashSet<int>(Objects.Select(t => t.Id));
+            var dataTypes = Objects.ToDictionary(t => t.Id);
             var allContentTypes = Services.ContentTypeService.GetAllContentTypes();
             allContentTypes.MigrateEach(contentType => {
-                var relevantProperties = contentType.PropertyTypes.Where(p => dataTypeIds.Contains(p.DataTypeDefinitionId)).ToArray();
+                var relevantProperties = contentType.PropertyTypes.Where(p => dataTypes.ContainsKey(p.DataTypeDefinitionId)).ToArray();
                 if (!relevantProperties.Any())
                     return;
 
-                ChangePropertyValues(contentType, relevantProperties, change);
+                ChangePropertyValues(contentType, relevantProperties, change, dataTypes);
             });
             return this;
         }
@@ -160,15 +160,28 @@ namespace uMigrate.Internal.SyntaxImplementations {
             });
         }
 
-        private void ChangePropertyValues<TFrom, TTo>(IContentType contentType, PropertyType[] properties, Func<TFrom, TTo> change) {
+        private void ChangePropertyValues<TFrom, TTo>(IContentType contentType, PropertyType[] properties, Func<TFrom, TTo> change, IReadOnlyDictionary<int, IDataTypeDefinition> dataTypes) {
             var contents = Services.ContentService.GetContentOfContentType(contentType.Id);
+            var logCount = 0;
             contents.MigrateEach(c => {
                 properties.MigrateEach(p => {
-                    var value = c.GetValue<TFrom>(p.Alias);
-                    c.SetValue(p.Alias, change(value));
+                    var oldValue = c.GetValue<TFrom>(p.Alias);
+                    var newValue = change(oldValue);
+                    c.SetValue(p.Alias, newValue);
+
+                    if (logCount < 10) {
+                        Logger.Log(
+                            "DataType: '{0}', changed {1} on '{2}': '{3}' => '{4}'.",
+                            dataTypes[p.DataTypeDefinitionId].Name, p.Alias, c.Name, oldValue, newValue
+                        );
+                    }
+                    logCount += 1;
                 });
                 Services.ContentService.SaveThenPublishIfPublished(c);
             });
+
+            if (logCount > 10)
+                Logger.Log("DataType: multiple, changed {0} more values.", logCount - 10);
         }
     }
 }

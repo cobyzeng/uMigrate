@@ -3,9 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace uMigrate.Tests.Integration {
     public class DataTypeTests : IntegrationTestsBase {
+        [Test]
+        public void ChangeAllPropertyValues_ChangesAllPropertiesOfSpecifiedType() {
+            var id = Guid.NewGuid();
+            IContent content = null;
+            RunMigration(m => {
+                var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id);
+                var contentType = m.ContentTypes
+                    .Add("ContentType")
+                    .AddProperty("Property1", dataType.Object)
+                    .AddProperty("Property2", dataType.Object);
+
+                content = Services.ContentService.CreateContent("Content", -1, contentType.Object.Alias);
+                content.SetValue("Property1", "A");
+                content.SetValue("Property2", "B");
+                Services.ContentService.Save(content);
+            });
+            RunMigration(m => m.DataType("Test").ChangeAllPropertyValues<string, string>(s => s + s));
+
+            var reloaded = Services.ContentService.GetById(content.Id);
+            Assert.AreEqual("AA", reloaded.GetValue("Property1"));
+            Assert.AreEqual("BB", reloaded.GetValue("Property2"));
+        }
+
+
         [Test]
         public void SetEditorAlias_SetsEditorAlias() {
             var id = Guid.NewGuid();

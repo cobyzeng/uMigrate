@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using log4net.Config;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 
 namespace uMigrate.Tests.Integration.Internal {
     public class TestUmbracoApplication : UmbracoApplicationBase {
@@ -22,6 +24,7 @@ namespace uMigrate.Tests.Integration.Internal {
             database.Drop();
             database.Create();
 
+            Directory.CreateDirectory(IOHelper.MapPath("~/App_Plugins"));
             Application_Start(this, EventArgs.Empty);
         }
 
