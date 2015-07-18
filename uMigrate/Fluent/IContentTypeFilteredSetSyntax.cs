@@ -13,6 +13,7 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IContentTypeSetSyntax AddPropertyGroup([NotNull] string name);
         [PublicAPI, NotNull] IContentTypeSetSyntax RenamePropertyGroup([NotNull] string oldName, [NotNull] string newName);
         [PublicAPI, NotNull] IContentTypeSetSyntax SortPropertyGroups([NotNull] Func<PropertyGroup, PropertyGroup, int> compare);
+        [PublicAPI, NotNull] IContentTypeSetSyntax SortPropertyGroups([NotNull] params string[] sortedPropertyGroupNames);
         [PublicAPI, NotNull] IContentTypeSetSyntax RemovePropertyGroup([NotNull] string name);
 
         [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] string dataTypeName, [CanBeNull] string propertyGroupName = null, [NotNull] params Action<PropertyType>[] setups);
@@ -24,7 +25,7 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IContentTypeSetSyntax ChangeProperty<TFrom, TTo>([NotNull] string propertyAlias, [NotNull] Action<PropertyType> change, [NotNull] Func<TFrom, TTo> convert);
         [PublicAPI, NotNull] IContentTypeSetSyntax MoveProperty([NotNull] string propertyAlias, [NotNull] string newPropertyGroupName);
         [PublicAPI, NotNull] IContentTypeSetSyntax SortProperties([CanBeNull] string propertyGroupName, [NotNull] Func<PropertyType, PropertyType, int> compare);
-        [PublicAPI, NotNull] IContentTypeSetSyntax SortProperties([CanBeNull] string propertyGroupName, params string[] sortedPropertyAliases);
+        [PublicAPI, NotNull] IContentTypeSetSyntax SortProperties([CanBeNull] string propertyGroupName, [NotNull] params string[] sortedPropertyAliases);
 
         [PublicAPI, NotNull] IContentTypeSetSyntax Change([NotNull] Action<IContentType> change);
 

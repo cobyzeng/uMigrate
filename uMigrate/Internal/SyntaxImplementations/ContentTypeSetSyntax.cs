@@ -80,7 +80,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             var otherContentType = Services.ContentTypeService.GetContentType(otherContentTypeAlias);
             Ensure.That(otherContentType != null, "Content type '{0}' was not found.", otherContentTypeAlias);
 
-            return AllowUnder(NewSet(new[] { otherContentType }));
+            return AllowUnder(NewSet(otherContentType));
         }
 
         public IContentTypeSetSyntax AddPropertyGroup(string name) {
@@ -132,13 +132,27 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
                 for (var i = 0; i < sorted.Count; i++) {
                     var group = sorted[i];
-                    if (group.SortOrder == i)
-                        continue;
-
-                    Logger.Log("ContentType: '{0}', tab '{1}', changing sort order: {2} => {3}.", contentType.Name, group.Name, group.SortOrder, i);
-                    group.SortOrder = i;
+                    SetSortOrderIfRequired(group, i, contentType);
                 }
             });
+        }
+
+        public IContentTypeSetSyntax SortPropertyGroups(params string[] sortedPropertyGroupNames) {
+            return Change(contentType => {
+                for (var i = 0; i < sortedPropertyGroupNames.Length; i++) {
+                    var name = sortedPropertyGroupNames[i];
+                    var propertyGroup = EnsurePropertyGroup(contentType, name);
+                    SetSortOrderIfRequired(propertyGroup, i, contentType);
+                }
+            });
+        }
+
+        private void SetSortOrderIfRequired(PropertyGroup group, int newSortOrder, IContentType contentType) {
+            if (group.SortOrder == newSortOrder)
+                return;
+
+            Logger.Log("ContentType: '{0}', tab '{1}', changing sort order: {2} => {3}.", contentType.Name, group.Name, group.SortOrder, newSortOrder);
+            group.SortOrder = newSortOrder;
         }
 
         public IContentTypeSetSyntax RemovePropertyGroup(string name) {
@@ -304,13 +318,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return Change(contentType => {
                 for (var i = 0; i < sortedPropertyAliases.Length; i++) {
                     var alias = sortedPropertyAliases[i];
-                    var property = contentType.PropertyTypes.FirstOrDefault(p => p.Alias == alias);
-                    Ensure.That(
-                        property != null,
-                        "Property '{0}' was not found on '{1}'. Available properties: '{2}'.",
-                        alias, contentType.Name, string.Join("', '", contentType.PropertyTypes.Select(p => p.Alias).OrderBy(n => n))
-                    );
-
+                    var property = EnsureProperty(contentType, alias);
                     SetSortOrderIfRequired(property, i, contentType);
                 }
             });

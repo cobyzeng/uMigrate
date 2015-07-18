@@ -20,6 +20,46 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void SortPropertyGroups_ReordersPropertyGroups_WhenCurrentSortOrderDoesNotMatchComparison() {
+            RunMigration(m => {
+                m.ContentTypes
+                    .Add("Test")
+                    .AddPropertyGroup("PropertyGroup2")
+                    .AddPropertyGroup("PropertyGroup3")
+                    .AddPropertyGroup("PropertyGroup1");
+            });
+
+            // ReSharper disable once StringCompareIsCultureSpecific.1
+            RunMigration(m => m.ContentType("Test").SortPropertyGroups((a, b) => string.Compare(a.Name, b.Name)));
+
+            var contentType = Services.ContentTypeService.GetContentType("Test");
+            CollectionAssert.AreEqual(
+                new[] { "PropertyGroup1", "PropertyGroup2", "PropertyGroup3" },
+                contentType.PropertyGroups.OrderBy(p => p.SortOrder).Select(p => p.Name).ToArray()
+            );
+        }
+
+        [Test]
+        public void SortPropertyGroups_ReordersPropertyGroups_WhenCurrentSortOrderDoesNotMatchProvided() {
+            RunMigration(m => {
+                m.ContentTypes
+                    .Add("Test")
+                    .AddPropertyGroup("PropertyGroup2")
+                    .AddPropertyGroup("PropertyGroup3")
+                    .AddPropertyGroup("PropertyGroup1");
+            });
+
+            // ReSharper disable once StringCompareIsCultureSpecific.1
+            RunMigration(m => m.ContentType("Test").SortPropertyGroups("PropertyGroup1", "PropertyGroup2", "PropertyGroup3"));
+
+            var contentType = Services.ContentTypeService.GetContentType("Test");
+            CollectionAssert.AreEqual(
+                new[] { "PropertyGroup1", "PropertyGroup2", "PropertyGroup3" },
+                contentType.PropertyGroups.OrderBy(p => p.SortOrder).Select(p => p.Name).ToArray()
+            );
+        }
+
+        [Test]
         public void SortProperties_ReordersProperties_WhenCurrentSortOrderDoesNotMatchComparison() {
             RunMigration(m => {
                 var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.TextboxAlias, null).Object;
