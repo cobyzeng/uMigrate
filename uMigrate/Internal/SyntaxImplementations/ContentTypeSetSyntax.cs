@@ -89,7 +89,10 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return this;
         }
 
-        private void AddPropertyGroupIfNeededInternal(IContentType contentType, string name) {
+        private void AddPropertyGroupIfNeededInternal([NotNull] IContentType contentType, [CanBeNull] string name) {
+            if (name == null)
+                return;
+
             if (contentType.AddPropertyGroup(name))
                 Logger.Log("ContentType: '{0}', added tab '{1}'.", contentType.Name, name);
         }
@@ -118,7 +121,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             if (oldGroup.PropertyTypes.Count > 0) {
                 var propertiesToMove = oldGroup.PropertyTypes.ToArray();
                 foreach (var property in propertiesToMove) {
-                    MovePropertyInternal(contentType, property.Alias, groupWithNewName.Name);
+                    MovePropertyInternal(contentType, property, groupWithNewName.Name);
                 }
             }
 
@@ -289,15 +292,26 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         public IContentTypeSetSyntax MoveProperty(string propertyAlias, string newPropertyGroupName) {
             return Change(contentType => {
-                EnsureProperty(contentType, propertyAlias);
+                var property = EnsureProperty(contentType, propertyAlias);
                 AddPropertyGroupIfNeededInternal(contentType, newPropertyGroupName);
-                MovePropertyInternal(contentType, propertyAlias, newPropertyGroupName);
+                MovePropertyInternal(contentType, property, newPropertyGroupName);
             });
         }
 
-        private void MovePropertyInternal(IContentType contentType, string propertyAlias, string newPropertyGroupName) {
-            contentType.MovePropertyType(propertyAlias, newPropertyGroupName);
-            Logger.Log("ContentType: '{0}', moved property '{1}' to tab '{2}'.", contentType.Name, propertyAlias, newPropertyGroupName);
+        private void MovePropertyInternal([NotNull] IContentType contentType, [NotNull] PropertyType property, [CanBeNull] string newPropertyGroupName) {
+            if (newPropertyGroupName == null) {
+                // This does not seem to be supported by Umbraco API: http://issues.umbraco.org/issue/U4-6832.
+                var previousPropertyGroup = contentType.PropertyGroups.SingleOrDefault(g => g.PropertyTypes.Contains(property));
+                if (previousPropertyGroup != null)
+                    previousPropertyGroup.PropertyTypes.Remove(property);
+
+                contentType.AddPropertyType(property);
+                Logger.Log("ContentType: '{0}', moved property '{1}' to default tab.", contentType.Name, property.Alias);
+                return;
+            }
+
+            contentType.MovePropertyType(property.Alias, newPropertyGroupName);
+            Logger.Log("ContentType: '{0}', moved property '{1}' to tab '{2}'.", contentType.Name, property.Alias, newPropertyGroupName);
         }
 
         public IContentTypeSetSyntax SortProperties(string propertyGroupName, Func<PropertyType, PropertyType, int> compare) {

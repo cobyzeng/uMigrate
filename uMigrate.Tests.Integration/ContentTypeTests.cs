@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace uMigrate.Tests.Integration {
     public class ContentTypeTests : IntegrationTestsBase {
@@ -60,9 +61,30 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void MoveProperty_MovesPropertyToDefaultGroup_IfGroupNameIsNull() {
+            RunMigration(m => m.ContentTypes.Add("Test").AddProperty("Property", StubDataType(m), propertyGroupName: "OldGroup"));
+
+            RunMigration(m => m.ContentType("Test").MoveProperty("Property", null));
+
+            var contentType = Services.ContentTypeService.GetContentType("Test");
+            CollectionAssert.DoesNotContain(contentType.PropertyGroups["OldGroup"].PropertyTypes.Select(p => p.Alias), "Property");
+            CollectionAssert.Contains(contentType.PropertyTypes.Select(p => p.Alias), "Property");
+        }
+
+        [Test]
+        public void MoveProperty_MovesPropertyToSpecifiedGroup() {
+            RunMigration(m => m.ContentTypes.Add("Test").AddProperty("Property", StubDataType(m)));
+
+            RunMigration(m => m.ContentType("Test").MoveProperty("Property", "NewGroup"));
+
+            var contentType = Services.ContentTypeService.GetContentType("Test");
+            CollectionAssert.Contains(contentType.PropertyGroups["NewGroup"].PropertyTypes.Select(p => p.Alias), "Property");
+        }
+
+        [Test]
         public void SortProperties_ReordersProperties_WhenCurrentSortOrderDoesNotMatchComparison() {
             RunMigration(m => {
-                var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.TextboxAlias, null).Object;
+                var dataType = StubDataType(m);
                 m.ContentTypes
                     .Add("Test")
                     .AddProperty("Property2", dataType)
@@ -83,7 +105,7 @@ namespace uMigrate.Tests.Integration {
         [Test]
         public void SortProperties_ReordersProperties_WhenCurrentSortOrderDoesNotMatchProvided() {
             RunMigration(m => {
-                var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.TextboxAlias, null).Object;
+                var dataType = StubDataType(m);
                 m.ContentTypes
                     .Add("Test")
                     .AddProperty("Property2", dataType)
@@ -117,6 +139,10 @@ namespace uMigrate.Tests.Integration {
 
             var deleted = Services.ContentTypeService.GetContentType("ToDelete");
             Assert.IsNull(deleted);
+        }
+
+        private static IDataTypeDefinition StubDataType(UmbracoMigrationBase m) {
+            return m.DataTypes.Add("Test", Constants.PropertyEditors.TextboxAlias, null).Object;
         }
     }
 }
