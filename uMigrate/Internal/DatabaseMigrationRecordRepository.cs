@@ -19,20 +19,31 @@ namespace uMigrate.Internal {
 
         public void SaveNew(MigrationRecord record) {
             EnsureTable();
+            TruncateLogIfRequired(record);
             _database.Insert(record);
         }
 
-        public void Save(IReadOnlyList<MigrationRecord> migrations) {
+        public void Save(IReadOnlyList<MigrationRecord> records) {
             EnsureTable();
-            foreach (var migration in migrations) {
-                var exists = _database.Exists<MigrationRecord>(migration.Version);
+            foreach (var record in records) {
+                TruncateLogIfRequired(record);
+
+                var exists = _database.Exists<MigrationRecord>(record.Version);
                 if (exists) {
-                    _database.Update(migration);
+                    _database.Update(record);
                 }
                 else {
-                    _database.Insert(migration);
+                    _database.Insert(record);
                 }
             }
+        }
+
+        private static void TruncateLogIfRequired(MigrationRecord record) {
+            if (record.Log == null || record.Log.Length <= MigrationRecord.DefaultMaxLogLength)
+                return;
+
+            var suffix = Environment.NewLine + "… Log limit reached …";
+            record.Log = record.Log.Substring(0, MigrationRecord.DefaultMaxLogLength - suffix.Length) + suffix;
         }
 
         private void EnsureTable() {

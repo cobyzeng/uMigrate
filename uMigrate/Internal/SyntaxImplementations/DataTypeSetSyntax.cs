@@ -164,11 +164,14 @@ namespace uMigrate.Internal.SyntaxImplementations {
             var contents = Services.ContentService.GetContentOfContentType(contentType.Id);
             var logCount = 0;
             contents.MigrateEach(c => {
+                var changed = false;
                 properties.MigrateEach(p => {
                     var oldValue = c.GetValue<TFrom>(p.Alias);
                     var newValue = change(oldValue);
-                    c.SetValue(p.Alias, newValue);
+                    if (Equals(newValue, oldValue))
+                        return;
 
+                    c.SetValue(p.Alias, newValue);
                     if (logCount < 10) {
                         Logger.Log(
                             "DataType: '{0}', changed {1} on '{2}': '{3}' => '{4}'.",
@@ -176,8 +179,11 @@ namespace uMigrate.Internal.SyntaxImplementations {
                         );
                     }
                     logCount += 1;
+                    changed = true;
                 });
-                Services.ContentService.SaveThenPublishIfPublished(c);
+
+                if (changed)
+                    Services.ContentService.SaveThenPublishIfPublished(c);
             });
 
             if (logCount > 10)

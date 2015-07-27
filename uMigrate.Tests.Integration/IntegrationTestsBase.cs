@@ -23,12 +23,13 @@ namespace uMigrate.Tests.Integration {
             _application.Start();
 
             var database = _application.ApplicationContext.DatabaseContext.Database;
+            MigrationRecords = new DatabaseMigrationRecordRepository(database);
             _migrator = new UmbracoMigrator(
                 Mock.Of<IMigrationResolver>(m => m.GetAllMigrations() == new[] {_migration}),
                 new MigrationContext(
                     new ServiceContextWrapper(_application.ApplicationContext.Services),
                     database,
-                    new DatabaseMigrationRecordRepository(database),
+                    MigrationRecords,
                     new MigrationLogger(TextWriter.Null, LogManager.GetLogger(typeof(MigrationLogger)))
                 ),
                 LogManager.GetLogger(typeof(UmbracoMigrator))
@@ -44,6 +45,8 @@ namespace uMigrate.Tests.Integration {
             _application = null;
             _migrator = null;
         }
+
+        public IMigrationRecordRepository MigrationRecords { get; private set; }
         
         protected ServiceContext Services {
             get {

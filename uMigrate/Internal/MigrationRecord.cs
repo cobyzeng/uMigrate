@@ -8,6 +8,7 @@ namespace uMigrate.Internal {
     [TableName(DefaultTableName)]
     public class MigrationRecord {
         public const string DefaultTableName = "migrationRecord";
+        public const int DefaultMaxLogLength = 2048;
         
         // ReSharper disable once NotNullMemberIsNotInitialized
         [NotNull, Length(50), PrimaryKeyColumn(AutoIncrement = false, Name = "PK_MigrationRecord")]
@@ -19,7 +20,7 @@ namespace uMigrate.Internal {
 
         public DateTime DateExecuted { get; set; }
 
-        [CanBeNull, NullSetting, Length(2048)]
+        [CanBeNull, NullSetting, Length(DefaultMaxLogLength)]
         public string Log { get; set; }
     }
 }

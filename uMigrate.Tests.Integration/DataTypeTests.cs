@@ -30,6 +30,25 @@ namespace uMigrate.Tests.Integration {
             Assert.AreEqual("BB", reloaded.GetValue("Property2"));
         }
 
+        [Test]
+        public void ChangeAllPropertyValues_DoesNotLogChangeWhenValuesAreSame() {
+            var id = Guid.NewGuid();
+            IContent content = null;
+            RunMigration(m => {
+                var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id);
+                var contentType = m.ContentTypes
+                    .Add("ContentType")
+                    .AddProperty("Property", dataType.Object);
+
+                content = Services.ContentService.CreateContent("Content", -1, contentType.Object.Alias);
+                content.SetValue("Property", "TestPropertyValue");
+                Services.ContentService.Save(content);
+            });
+            RunMigration(m => m.DataType("Test").ChangeAllPropertyValues<string, string>(s => s));
+
+            var record = MigrationRecords.GetAll().Last();
+            StringAssert.DoesNotContain("TestPropertyValue", record.Log);
+        }
 
         [Test]
         public void SetEditorAlias_SetsEditorAlias() {

@@ -9,6 +9,7 @@
     <description>$description$</description>
     <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
     <releaseNotes>
+      0.11.2 Fixed bug where data changes caused unnecessary logging.
       0.11.1 Added a workaround for moving property to a default group.
       0.11.0 Added ContentType.Delete, DataType.SetPropertyAlias and ContentType.SortProperties(list) to fluent API.
       0.10.0 Support for other database engines (where supported by Umbraco), e.g. SQL CE.
