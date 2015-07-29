@@ -5,8 +5,13 @@ build:
   publish_nuget: true
   verbosity: minimal
 
+cache:
+  packages -> **\packages.config
+
 deploy:
-  provider: NuGet
-  api_key:
-    secure: K+acArHRTR2l7LuM23TN9Rd1LK/R+cw7P35Dkfu3Q479iGHyJ/XNO/UZf9OeCGyz
-  artifact: /.*\.nupkg/
+  - provider: NuGet
+    on:
+      branch: master
+    api_key:
+      secure: K+acArHRTR2l7LuM23TN9Rd1LK/R+cw7P35Dkfu3Q479iGHyJ/XNO/UZf9OeCGyz
+    artifact: /.*\.nupkg/
