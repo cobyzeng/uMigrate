@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using log4net;
 
 namespace uMigrate {
     public interface IMigrationLogger {
@@ -8,5 +9,7 @@ namespace uMigrate {
 
         [StringFormatMethod("format")]
         void Log(string format, params object[] args);
+
+        ILog System { get; }
     }
 }

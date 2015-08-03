@@ -4,8 +4,8 @@ using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ReflectionMagic;
+using SQLCE4Umbraco;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -28,6 +28,11 @@ namespace uMigrate.Tests.Integration.Internal {
         }
 
         public void Drop() {
+            // not sure why Umbraco never closes this
+            typeof (SqlCeContextGuardian)
+                .AsDynamicType()
+                .CloseBackgroundConnection();
+
             var file = GetFile();
             if (file.Exists)
                 file.Delete();

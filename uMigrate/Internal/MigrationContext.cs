@@ -7,7 +7,6 @@ using umbraco.cms.businesslogic.propertytype;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
 
 namespace uMigrate.Internal {
     public class MigrationContext : IMigrationContext {
