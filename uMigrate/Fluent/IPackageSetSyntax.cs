@@ -5,6 +5,6 @@ using JetBrains.Annotations;
 
 namespace uMigrate.Fluent {
     public interface IPackageSetSyntax {
-        void Install([NotNull] string packagePath, [CanBeNull] PackageInstallSettings settings = null);
+        void Install([NotNull, PathReference] string packagePath, [CanBeNull] PackageInstallSettings settings = null);
     }
 }

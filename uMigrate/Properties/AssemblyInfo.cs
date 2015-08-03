@@ -18,6 +18,6 @@ namespace uMigrate.Properties {
     public static class AssemblyInfo {
         // please follow SemVer here:
         public const string VersionString = "0.12.0";
-        public const string InformationalVersionString = VersionString + "-pre-packages";
+        public const string InformationalVersionString = VersionString + "-pre-packages-2";
     }
 }
