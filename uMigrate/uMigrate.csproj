@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <NuGetPackageImportStamp>abb9d28d</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -227,10 +228,12 @@
     <Compile Include="Fluent\IContentFilteredSetSyntax.cs" />
     <Compile Include="Fluent\IContentSetSyntax.cs" />
     <Compile Include="Fluent\IDatabaseSyntax.cs" />
+    <Compile Include="Fluent\PackageInstallSettings.cs" />
     <Compile Include="Infrastructure\MigrationRunEventArgs.cs" />
     <Compile Include="Infrastructure\MigrationRunStartingEventArgs.cs" />
     <Compile Include="Internal\IMigrationTypeProvider.cs" />
     <Compile Include="Internal\AppDomainAssemblyMigrationTypeProvider.cs" />
+    <Compile Include="Fluent\IPackageSetSyntax.cs" />
     <Compile Include="Internal\ServiceContextWrapper.cs" />
     <Compile Include="Internal\SyntaxImplementations\ContentSetSyntax.cs" />
     <Compile Include="Fluent\IDataTypeFilteredSetSyntax.cs" />
@@ -239,6 +242,7 @@
     <Compile Include="Fluent\ISetSyntax.cs" />
     <Compile Include="Fluent\ITemplateFilteredSetSyntax.cs" />
     <Compile Include="Fluent\ITemplateSetSyntax.cs" />
+    <Compile Include="Internal\SyntaxImplementations\PackageSetSyntax.cs" />
     <Compile Include="Internal\SyntaxImplementations\TemplateSetSyntax.cs" />
     <Compile Include="Internal\DatabaseMigrationRecordRepository.cs" />
     <Compile Include="Internal\EmbeddedResourceHelper.cs" />
@@ -274,7 +278,6 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

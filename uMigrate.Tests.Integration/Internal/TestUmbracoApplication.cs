@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
+using System.Linq;
 using log4net.Config;
+using ReflectionMagic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -15,16 +16,14 @@ namespace uMigrate.Tests.Integration.Internal {
 
         public void Start() {
             XmlConfigurator.Configure();
-            typeof(UmbracoConfig).GetMethod(
-                "SetUmbracoSettings",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-            ).Invoke(UmbracoConfig.For, new[] { new UmbracoSettingsSection() });
+            UmbracoConfig.For.AsDynamic().SetUmbracoSettings(new UmbracoSettingsSection());
 
             var database = new TestDatabaseHelper();
             database.Drop();
             database.Create();
 
             Directory.CreateDirectory(IOHelper.MapPath("~/App_Plugins"));
+
             Application_Start(this, EventArgs.Empty);
         }
 

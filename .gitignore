@@ -7,3 +7,5 @@ packages/
 _ReSharper.*
 /*.nupkg
 uMigrate.Tests.Integration/App_Data/
+uMigrate.Tests.Integration/App_Plugins/
+uMigrate.Tests.Integration/Views/

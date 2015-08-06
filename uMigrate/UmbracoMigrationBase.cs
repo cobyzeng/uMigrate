@@ -66,6 +66,11 @@ namespace uMigrate {
         }
 
         [PublicAPI]
+        public IPackageSetSyntax Packages {
+            get { return new PackageSetSyntax(Context); }
+        }
+
+        [PublicAPI]
         public IMigrationLogger Logger {
             get { return Context.Logger; }
         }

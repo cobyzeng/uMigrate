@@ -22,5 +22,9 @@ namespace uMigrate.Internal {
             _writer.WriteLine(format, args);
             _logger.DebugFormat(format, args);
         }
+
+        public ILog System {
+            get { return _logger; }
+        }
     }
 }
