@@ -9,6 +9,7 @@
     <description>Migration framework for Umbraco (Core+UI).</description>
     <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
     <releaseNotes>
+      0.12.1 Fixed edge case bug where it was not possible to manually resave migration records.
       0.12.0 Added Packages.Install to install Umbraco packages during a migration (experimental). No Unistall yet.
       0.11.2 Fixed bug where data changes caused unnecessary logging.
       0.11.1 Added a workaround for moving property to a default group.

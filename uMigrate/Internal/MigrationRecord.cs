@@ -6,6 +6,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace uMigrate.Internal {
     [TableName(DefaultTableName)]
+    [PrimaryKey("Version", autoIncrement= false)]
     public class MigrationRecord {
         public const string DefaultTableName = "migrationRecord";
         public const int DefaultMaxLogLength = 2048;
