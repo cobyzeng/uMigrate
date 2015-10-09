@@ -21,6 +21,28 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void SetParent_ChangesParentToNewValue() {
+            RunMigration(m => {
+                m.ContentTypes.Add("Parent");
+                m.ContentTypes.Add("Child");
+            });
+            RunMigration(m => m.ContentType("Child").SetParent("Parent"));
+
+            var childType = Services.ContentTypeService.GetContentType("Child");
+            var parentType = Services.ContentTypeService.GetContentType("Parent");
+            Assert.AreEqual(parentType.Id, childType.ParentId);
+        }
+
+        [Test]
+        public void SetParent_RemovesParent_WhenSetToNull() {
+            RunMigration(m => m.ContentTypes.Add("Parent").AddChild("Child"));
+            RunMigration(m => m.ContentType("Child").SetParent(null));
+
+            var childType = Services.ContentTypeService.GetContentType("Child");
+            Assert.AreEqual(Constants.System.Root, childType.ParentId);
+        }
+
+        [Test]
         public void SortPropertyGroups_ReordersPropertyGroups_WhenCurrentSortOrderDoesNotMatchComparison() {
             RunMigration(m => {
                 m.ContentTypes
@@ -121,6 +143,34 @@ namespace uMigrate.Tests.Integration {
                 new[] { "Property1", "Property2", "Property3" },
                 contentType.PropertyTypes.OrderBy(p => p.SortOrder).Select(p => p.Alias).ToArray()
             );
+        }
+
+        [Test]
+        public void Parent_ReturnsAllParents() {
+            RunMigration(m => {
+                m.ContentTypes
+                    .Add("Parent1").AddChild("Child1")
+                    .Add("Parent2").AddChild("Child2");
+            });
+
+            var parents = GetFluent(
+                m => m.ContentTypes
+                      .Where(t => t.Name.StartsWith("Child"))
+                      .Parent().Objects
+            );
+
+            CollectionAssert.AreEquivalent(
+                new[] { "Parent1", "Parent2" },
+                parents.Select(p => p.Name)
+            );
+        }
+
+        [Test]
+        public void Parent_ReturnsEmpty_IfContentTypeIsOnTopLevel() {
+            RunMigration(m => m.ContentTypes.Add("Top"));
+            var parents = GetFluent(m => m.ContentType("Top").Parent().Objects);
+
+            CollectionAssert.IsEmpty(parents.Select(p => p.Name));
         }
 
         [Test]
