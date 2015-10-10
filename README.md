@@ -1,6 +1,6 @@
 # uMigrate
 
-![Build Status](https://ci.appveyor.com/api/projects/status/github/affinityid/umigrate?svg=true&branch=MASTER&passingText=MASTER%20BUILD%20OK&failingText=MASTER%20BUILD%20FAILED&pendingText=MASTER%20BUILD%20QUEUED)
+![Build Status](https://ci.appveyor.com/api/projects/status/github/affinityid/umigrate?svg=true&branch=MASTER&passingText=MASTER%20BUILD%20OK&failingText=MASTER%20BUILD%20FAILED&pendingText=MASTER%20BUILD%20QUEUED) [![NuGet: uMigrate](https://img.shields.io/nuget/v/uMigrate.svg?style=flat&label=NuGet:%20uMigrate)](https://www.nuget.org/packages/uMigrate/) [![NuGet: uMigrate.Core](https://img.shields.io/nuget/v/uMigrate.Core.svg?style=flat&label=NuGet:%20uMigrate.Core)](https://www.nuget.org/packages/uMigrate.Core/)
 
 A code-first migration framework for Umbraco (7.1.4+) started at [Affinity ID](http://www.affinityid.co.nz).  
 You can use it to add/change/remove Document Types, Data Types, etc.
