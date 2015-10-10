@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 namespace uMigrate.Fluent {
     public interface IDataTypeFilteredSetSyntax : IFilteredSetSyntax<IDataTypeDefinition, IDataTypeFilteredSetSyntax> {
         [PublicAPI, NotNull] IDataTypeFilteredSetSyntax WhereEditorAliasIs([NotNull] string alias);
+
         [PublicAPI, NotNull] IDataTypeSetSyntax SetEditorAlias([NotNull] string alias);
 
         [PublicAPI, NotNull] IDataTypeSetSyntax SetPreValue([NotNull] string name, [NotNull] string value);
@@ -19,6 +20,8 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>([NotNull] Func<TFrom, TTo> change);
         [PublicAPI, NotNull] IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>([NotNull] Func<TFrom, IContent, TTo> change);
         [PublicAPI, NotNull] IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>([NotNull] Func<TFrom, IContent, PropertyType, TTo> change);
+
+        [PublicAPI, NotNull] IDataTypeSetSyntax Change([NotNull] Action<IDataTypeDefinition> change);
 
         [PublicAPI] void Delete();
     }

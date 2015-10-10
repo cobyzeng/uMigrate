@@ -149,6 +149,12 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return this;
         }
 
+        public IDataTypeSetSyntax Change(Action<IDataTypeDefinition> change) {
+            ChangeWithManualSave(d => change(d));
+            Services.DataTypeService.Save(Objects);
+            return this;
+        }
+
         public IDataTypeSetSyntax Delete(string name) {
             Argument.NotNull("name", name);
             var dataType = Where(d => d.Name == name);

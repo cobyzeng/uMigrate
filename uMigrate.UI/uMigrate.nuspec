@@ -11,7 +11,7 @@
     <releaseNotes>
       0.13.0
         * Added uMigrate:Enabled app setting to disable uMigrate if needed.
-        * Added ContentType.Parent, ContentType.SetParent, Template(alias).
+        * Added ContentType.Parent, ContentType.SetParent, Template(alias), DataType.Change.
         * Added more context to ChangeAllPropertyValues.
       0.12.2 Updated JetBrains.Annotations dependency (note that its public key changed).
       0.12.1 Fixed edge case bug where it was not possible to manually resave migration records.

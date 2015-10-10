@@ -61,6 +61,17 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void Change_SavesChanges() {
+            var id = Guid.NewGuid();
+            RunMigration(m => m.DataTypes.Add("OldName", Constants.PropertyEditors.NoEditAlias, id));
+
+            RunMigration(m => m.DataType("OldName").Change(d => d.Name = "NewName"));
+
+            var dataType = Services.DataTypeService.GetDataTypeDefinitionById(id);
+            Assert.AreEqual("NewName", dataType.Name);
+        }
+
+        [Test]
         public void Delete_RemovesByAlias_WhenCalledOnRootSetWithAlias() {
             var id = Guid.NewGuid();
             RunMigration(m => m.DataTypes.Add("ToDelete", Constants.PropertyEditors.TextboxAlias, id));
