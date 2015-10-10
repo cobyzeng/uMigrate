@@ -17,6 +17,8 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IDataTypeSetSyntax ChangePreValue([NotNull] string key, [NotNull] Action<PreValue> change);
 
         [PublicAPI, NotNull] IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>([NotNull] Func<TFrom, TTo> change);
+        [PublicAPI, NotNull] IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>([NotNull] Func<TFrom, IContent, TTo> change);
+        [PublicAPI, NotNull] IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>([NotNull] Func<TFrom, IContent, PropertyType, TTo> change);
 
         [PublicAPI] void Delete();
     }

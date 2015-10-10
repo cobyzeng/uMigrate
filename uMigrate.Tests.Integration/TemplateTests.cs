@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
-using umbraco.IO;
-using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace uMigrate.Tests.Integration {
     public class TemplateTests : IntegrationTestsBase {

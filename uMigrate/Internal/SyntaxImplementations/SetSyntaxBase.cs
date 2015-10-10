@@ -21,17 +21,10 @@ namespace uMigrate.Internal.SyntaxImplementations {
             _items = new Lazy<IReadOnlyList<TItem>>(items);
         }
 
-        [NotNull] protected IMigrationContext Context { get; private set; }
-        [NotNull]
-        protected IServiceContext Services {
-            get { return Context.Services; }
-        }
-
-        [NotNull]
-        protected IMigrationLogger Logger {
-            // ReSharper disable once AssignNullToNotNullAttribute
-            get { return Context.Logger; }
-        }
+        [NotNull] protected IMigrationContext Context { get; }
+        [NotNull] protected IServiceContext Services => Context.Services;
+        // ReSharper disable once AssignNullToNotNullAttribute
+        [NotNull] protected IMigrationLogger Logger => Context.Logger;
 
         [NotNull] protected abstract TSetSyntax NewSet(IEnumerable<TItem> items);
         [CanBeNull] protected abstract string GetName(TItem item);
