@@ -25,16 +25,6 @@ namespace uMigrate.Infrastructure {
         }
 
         public void Run() {
-            try {
-                RunInternal();
-            }
-            catch (Exception ex) {
-                _logger.Fatal("Migration run failed.", ex);
-                throw;
-            }
-        }
-
-        protected void RunInternal() {
             _logger.Info("Migration run starting.");
 
             var runStartingArgs = new MigrationRunStartingEventArgs(_context);

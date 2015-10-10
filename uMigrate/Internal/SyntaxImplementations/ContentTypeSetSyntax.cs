@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using JetBrains.Annotations;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using uMigrate.Fluent;
 
@@ -81,6 +82,22 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Ensure.That(otherContentType != null, "Content type '{0}' was not found.", otherContentTypeAlias);
 
             return AllowUnder(NewSet(otherContentType));
+        }
+
+        public IContentTypeSetSyntax SetParent(string parentContentTypeAlias) {
+            var newParentId = Constants.System.Root;
+            var newParentNameText = "none";
+            if (parentContentTypeAlias != null) {
+                var parentContentType = Services.ContentTypeService.GetContentType(parentContentTypeAlias);
+                Ensure.That(parentContentType != null, "Content type '{0}' was not found.", parentContentTypeAlias);
+                newParentId = parentContentType.Id;
+                newParentNameText = $"'{parentContentType.Name}'";
+            }
+
+            return Change(c => {
+                c.ParentId = newParentId;
+                Logger.Log("ContentType: '{0}', set parent to {1}.", c.Name, newParentNameText);
+            });
         }
 
         public IContentTypeSetSyntax AddPropertyGroup(string name) {
@@ -371,6 +388,14 @@ namespace uMigrate.Internal.SyntaxImplementations {
                     c.Name, template != null ? template.Id.ToString(CultureInfo.InvariantCulture) : "none"
                 );
             });
+        }
+
+        public IContentTypeFilteredSetSyntax Parent() {
+            var parents = Objects
+                .Where(o => o.ParentId != Constants.System.Root)
+                .Select(o => Services.ContentTypeService.GetContentType(o.ParentId));
+
+            return NewSet(parents);
         }
 
         public IContentTypeFilteredSetSyntax DescendantsAndSelf() {

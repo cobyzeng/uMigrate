@@ -127,6 +127,14 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         public IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>(Func<TFrom, TTo> change) {
+            return ChangeAllPropertyValues<TFrom, TTo>((from, c, p) => change(from));
+        }
+
+        public IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>(Func<TFrom, IContent, TTo> change) {
+            return ChangeAllPropertyValues<TFrom, TTo>((from, content, p) => change(from, content));
+        }
+
+        public IDataTypeSetSyntax ChangeAllPropertyValues<TFrom, TTo>(Func<TFrom, IContent, PropertyType, TTo> change) {
             Argument.NotNull("change", change);
 
             var dataTypes = Objects.ToDictionary(t => t.Id);
@@ -138,6 +146,12 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
                 ChangePropertyValues(contentType, relevantProperties, change, dataTypes);
             });
+            return this;
+        }
+
+        public IDataTypeSetSyntax Change(Action<IDataTypeDefinition> change) {
+            ChangeWithManualSave(d => change(d));
+            Services.DataTypeService.Save(Objects);
             return this;
         }
 
@@ -160,24 +174,21 @@ namespace uMigrate.Internal.SyntaxImplementations {
             });
         }
 
-        private void ChangePropertyValues<TFrom, TTo>(IContentType contentType, PropertyType[] properties, Func<TFrom, TTo> change, IReadOnlyDictionary<int, IDataTypeDefinition> dataTypes) {
+        private void ChangePropertyValues<TFrom, TTo>(IContentType contentType, PropertyType[] properties, Func<TFrom, IContent, PropertyType, TTo> change, IReadOnlyDictionary<int, IDataTypeDefinition> dataTypes) {
             var contents = Services.ContentService.GetContentOfContentType(contentType.Id);
             var logCount = 0;
             contents.MigrateEach(c => {
                 var changed = false;
                 properties.MigrateEach(p => {
                     var oldValue = c.GetValue<TFrom>(p.Alias);
-                    var newValue = change(oldValue);
+                    var newValue = change(oldValue, c, p);
                     if (Equals(newValue, oldValue))
                         return;
 
                     c.SetValue(p.Alias, newValue);
-                    if (logCount < 10) {
-                        Logger.Log(
-                            "DataType: '{0}', changed {1} on '{2}': '{3}' => '{4}'.",
-                            dataTypes[p.DataTypeDefinitionId].Name, p.Alias, c.Name, oldValue, newValue
-                        );
-                    }
+                    if (logCount < 10)
+                        Logger.Log($"DataType: '{dataTypes[p.DataTypeDefinitionId].Name}', changed {p.Alias} on '{c.Name}': '{oldValue}' => '{newValue}'.");
+
                     logCount += 1;
                     changed = true;
                 });
@@ -187,7 +198,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             });
 
             if (logCount > 10)
-                Logger.Log("DataType: multiple, changed {0} more values.", logCount - 10);
+                Logger.Log($"DataType: multiple, changed {logCount - 10} more values.");
         }
     }
 }

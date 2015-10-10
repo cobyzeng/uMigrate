@@ -62,6 +62,14 @@ namespace uMigrate.Tests.Integration {
             _migrator.Run();
         }
 
+        protected T GetFluent<T>(Func<UmbracoMigrationBase, T> get) {
+            var result = default(T);
+            _migration.NextRun = m => result = get(m);
+            _migrator.Run();
+
+            return result;
+        }
+
         private class DelegateMigration : UmbracoMigrationBase {
             public Action<UmbracoMigrationBase> NextRun { get; set; }
             protected override void Run() {

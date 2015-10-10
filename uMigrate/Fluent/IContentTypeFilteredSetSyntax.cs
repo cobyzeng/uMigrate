@@ -10,6 +10,8 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IContentTypeSetSyntax AllowUnder([NotNull] IContentTypeFilteredSetSyntax otherContentTypes);
         [PublicAPI, NotNull] IContentTypeSetSyntax AllowUnder([NotNull] string otherContentTypeAlias);
 
+        [PublicAPI, NotNull] IContentTypeSetSyntax SetParent([CanBeNull] string parentContentTypeAlias);
+
         [PublicAPI, NotNull] IContentTypeSetSyntax AddPropertyGroup([NotNull] string name);
         [PublicAPI, NotNull] IContentTypeSetSyntax RenamePropertyGroup([NotNull] string oldName, [NotNull] string newName);
         [PublicAPI, NotNull] IContentTypeSetSyntax SortPropertyGroups([NotNull] Func<PropertyGroup, PropertyGroup, int> compare);
@@ -31,7 +33,8 @@ namespace uMigrate.Fluent {
 
         [PublicAPI, NotNull] IContentTypeSetSyntax AllowTemplate([NotNull] ITemplate template);
         [PublicAPI, NotNull] IContentTypeSetSyntax DefaultTemplate([CanBeNull] ITemplate template);
-
+        
+        [PublicAPI, NotNull] IContentTypeFilteredSetSyntax Parent();
         [PublicAPI, NotNull] IContentTypeFilteredSetSyntax DescendantsAndSelf();
 
         [PublicAPI, NotNull] IEnumerable<IContent> GetAllContents();
