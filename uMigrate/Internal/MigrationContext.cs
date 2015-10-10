@@ -34,7 +34,7 @@ namespace uMigrate.Internal {
             var cache = HttpContext.Current.Cache;
             foreach (DictionaryEntry entry in cache){
                 cache.Remove((string)entry.Key);
-            }        
+            }
         }
 
         public void RefreshContent() {
@@ -42,9 +42,10 @@ namespace uMigrate.Internal {
         }
 
         public void WorkaroundToRenamePropertyGroupAndSave(PropertyGroup propertyGroup, string newName) {
-            var oldApiGroup = PropertyTypeGroup.GetPropertyTypeGroup(propertyGroup.Id);
-            oldApiGroup.Name = newName;
-            oldApiGroup.Save();
+            Argument.NotNullOrEmpty("newName", newName);
+            var legacyGroup = PropertyTypeGroup.GetPropertyTypeGroup(propertyGroup.Id);
+            legacyGroup.Name = newName;
+            legacyGroup.Save();
             propertyGroup.Name = newName; // makes sure any later saves would be correct
         }
 

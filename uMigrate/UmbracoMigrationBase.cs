@@ -56,6 +56,13 @@ namespace uMigrate {
         }
 
         [PublicAPI]
+        public ITemplateFilteredSetSyntax Template(string alias) {
+            var template = Templates.Where(t => t.Alias == alias);
+            Ensure.That(template.Objects.Count > 0, "Template '{0}' was not found.", alias);
+            return template;
+        }
+
+        [PublicAPI]
         public ITemplateSetSyntax Templates {
             get { return new TemplateSetSyntax(Context); }
         }
