@@ -248,7 +248,7 @@
       <HintPath>..\packages\UmbracoCms.Core.7.3.5\lib\umbraco.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Umbraco.Core, Version=1.0.5858.25602, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Umbraco.Core">
       <HintPath>..\packages\UmbracoCms.Core.7.3.5\lib\Umbraco.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>

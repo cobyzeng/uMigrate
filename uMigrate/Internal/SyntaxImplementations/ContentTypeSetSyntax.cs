@@ -319,10 +319,24 @@ namespace uMigrate.Internal.SyntaxImplementations {
             if (newPropertyGroupName == null) {
                 // This does not seem to be supported by Umbraco API: http://issues.umbraco.org/issue/U4-6832.
                 var previousPropertyGroup = contentType.PropertyGroups.SingleOrDefault(g => g.PropertyTypes.Contains(property));
-                if (previousPropertyGroup != null)
-                    previousPropertyGroup.PropertyTypes.Remove(property);
+                previousPropertyGroup?.PropertyTypes.Remove(property);
 
-                contentType.AddPropertyType(property);
+                // This is required as PropertyGroup reference would not be reset otherwise
+                var propertyDataType = Context.Services.DataTypeService.GetDataTypeDefinitionById(property.DataTypeDefinitionId);
+                var recreatedProperty = new PropertyType(propertyDataType) {
+                    Id = property.Id,
+                    Alias = property.Alias,
+                    Key = property.Key,
+                    CreateDate = property.CreateDate,
+                    Description = property.Description,
+                    Mandatory = property.Mandatory,
+                    Name = property.Name,
+                    SortOrder = property.SortOrder,
+                    UpdateDate = property.UpdateDate,
+                    ValidationRegExp = property.ValidationRegExp
+                };
+
+                contentType.AddPropertyType(recreatedProperty);
                 Logger.Log("ContentType: '{0}', moved property '{1}' to default tab.", contentType.Name, property.Alias);
                 return;
             }
@@ -366,7 +380,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
         public IContentTypeSetSyntax Change(Action<IContentType> change) {
             ChangeWithManualSave(change);
             Services.ContentTypeService.Save(Objects);
-            Context.ClearCaches();
+            Context.ClearRuntimeCache(typeof(IContentType));
             return this;
         }
 

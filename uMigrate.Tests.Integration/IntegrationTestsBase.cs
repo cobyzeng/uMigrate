@@ -28,6 +28,7 @@ namespace uMigrate.Tests.Integration {
                 new MigrationContext(
                     new ServiceContextWrapper(_application.ApplicationContext.Services),
                     database,
+                    _application.ApplicationContext.ApplicationCache,
                     MigrationRecords,
                     new MigrationLogger(TextWriter.Null, LogManager.GetLogger(typeof(MigrationLogger)))
                 ),

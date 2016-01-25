@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Moq;
-using ReflectionMagic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;

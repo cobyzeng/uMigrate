@@ -61,6 +61,7 @@ namespace uMigrate.Infrastructure {
             var context = new MigrationContext(
                 new ServiceContextWrapper(applicationContext.Services),
                 applicationContext.DatabaseContext.Database,
+                applicationContext.ApplicationCache,
                 logRepository
             );
             var logger = LogManager.GetLogger(typeof(UmbracoMigrator));

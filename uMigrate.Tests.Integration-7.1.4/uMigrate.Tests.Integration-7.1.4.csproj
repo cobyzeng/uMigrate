@@ -267,7 +267,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="TestPackages\Chosen_Multi-Select_Menu_0.1.zip" />
   </ItemGroup>
   <ItemGroup>
