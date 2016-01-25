@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using log4net;
-using log4net.Core;
 using Moq;
 using NUnit.Framework;
 using uMigrate.Infrastructure;
@@ -40,7 +39,7 @@ namespace uMigrate.Tests.Integration {
         protected virtual void AfterEachTest() {
             if (_application != null) {
                 _application.Stop();
-                ((IDisposable) _application.ApplicationContext).Dispose();
+                ((IDisposable) _application.ApplicationContext)?.Dispose();
             }
             _application = null;
             _migrator = null;
@@ -48,14 +47,7 @@ namespace uMigrate.Tests.Integration {
 
         public IMigrationRecordRepository MigrationRecords { get; private set; }
         
-        protected ServiceContext Services {
-            get {
-                if (_application == null)
-                    return null;
-
-                return _application.ApplicationContext.Services;
-            }
-        }
+        protected ServiceContext Services => _application?.ApplicationContext.Services;
 
         protected void RunMigration(Action<UmbracoMigrationBase> run) {
             _migration.NextRun = run;
