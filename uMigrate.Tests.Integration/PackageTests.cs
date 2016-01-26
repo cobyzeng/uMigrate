@@ -19,7 +19,7 @@ namespace uMigrate.Tests.Integration {
 
         [TestCase(TestPackageNames.Chosen, "~/App_Plugins/ChosenSelectMenu/chosen/chosen-sprite.png")]
         [TestCase(TestPackageNames.Chosen, "~/Views/MacroPartials/ChosenSelectMenuView.cshtml")]
-        public void Install_CreatesExpectedFiles(string packageFileName, string deployedFileName) {           
+        public void Install_CreatesExpectedFiles(string packageFileName, string deployedFileName) {
             InstallPackage(packageFileName);
 
             deployedFileName = IOHelper.MapPath(deployedFileName);

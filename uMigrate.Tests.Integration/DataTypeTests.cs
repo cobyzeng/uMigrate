@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -61,6 +62,18 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void SetPreValue_DoesNotLosePreviousPreValues_WhenDoneQuicklyInSequence() {
+            var dataTypeId = -1;
+            RunMigration(m => dataTypeId = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, Guid.NewGuid()).Object.Id);
+            RunMigration(m => m.DataType("Test").SetPreValue("A", "ValueOfA").SetPreValue("B", "ValueOfB"));
+
+            var preValues = Services.DataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId);
+
+            Assert.AreEqual("ValueOfA", GetValue(preValues, "A"));
+            Assert.AreEqual("ValueOfB", GetValue(preValues, "B"));
+        }
+
+        [Test]
         public void Change_SavesChanges() {
             var id = Guid.NewGuid();
             RunMigration(m => m.DataTypes.Add("OldName", Constants.PropertyEditors.NoEditAlias, id));
@@ -89,6 +102,15 @@ namespace uMigrate.Tests.Integration {
 
             var deleted = Services.DataTypeService.GetDataTypeDefinitionById(id);
             Assert.IsNull(deleted);
+        }
+
+        [CanBeNull]
+        private string GetValue(PreValueCollection preValues, string key) {
+            PreValue preValue;
+            if (!preValues.PreValuesAsDictionary.TryGetValue(key, out preValue))
+                return null;
+
+            return preValue.Value;
         }
     }
 }

@@ -6,13 +6,14 @@ using System.IO;
 using System.Linq;
 using ReflectionMagic;
 using SQLCE4Umbraco;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace uMigrate.Tests.Integration.Internal {
-    public class TestDatabaseHelper {
+    public partial class TestDatabaseHelper {
         private const string ConnectionStringName = "umbracoDbDSN";
-
+        
         public void Create() {
             var file = GetFile();
             var cachedEmptyPath = file.FullName + ".empty";
@@ -23,7 +24,8 @@ namespace uMigrate.Tests.Integration.Internal {
 
             new SqlCeEngine(ConnectionString).CreateDatabase();
             SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-            new UmbracoDatabase(ConnectionStringName).CreateDatabaseSchema(false);
+
+            UmbracoVersionSpecificCreate();
             File.Copy(file.FullName, cachedEmptyPath);
         }
 

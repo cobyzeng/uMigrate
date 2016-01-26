@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -18,7 +19,7 @@ namespace uMigrate {
 
         [CanBeNull] IMigrationLogger Logger { get; }
 
-        void ClearCaches();
+        void ClearRuntimeCache(Type entityType);
 
         // wraps umbraco.library.RefreshContent
         void RefreshContent();

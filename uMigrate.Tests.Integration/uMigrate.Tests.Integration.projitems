@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>1f030f5f-8c37-4ec2-be45-e5b399bfaef1</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>uMigrate.Tests.Integration</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ContentTypeTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataTypeTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IntegrationTestsBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internal\StubCacheRefresher.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internal\TestDatabaseHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Internal\TestUmbracoApplication.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MigrationRecordTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PackageTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TemplateTests.cs" />
+  </ItemGroup>
+</Project>
