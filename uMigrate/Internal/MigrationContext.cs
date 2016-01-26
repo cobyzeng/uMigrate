@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Web;
 using JetBrains.Annotations;
 using umbraco;
 using umbraco.cms.businesslogic.propertytype;

@@ -101,21 +101,6 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
             return ChangeWithManualSave(dataType => {
                 var preValues = Services.DataTypeService.GetPreValuesCollectionByDataTypeId(dataType.Id);
-
-                //var preValuesInDb = Umbraco.Core.ApplicationContext.Current.DatabaseContext.Database
-                //    .Query<dynamic>("SELECT * FROM cmsDataTypePreValues WHERE datatypeNodeId = @dataTypeId", new { dataTypeId = dataType.Id })
-                //    .Select(d => new { alias = (string)d.alias, value = (string)d.value })
-                //    .OrderBy(x => x.alias)
-                //    .ToArray();
-
-                //var preValuesComparable = preValues.PreValuesAsDictionary
-                //    .Select(p => new { alias = p.Key, value = p.Value.Value })
-                //    .OrderBy(x => x.alias)
-                //    .ToArray();
-                
-                //if (!preValuesComparable.SequenceEqual(preValuesInDb))
-                //    System.Diagnostics.Debugger.Break();
-
                 change(preValues, dataType);
                 Services.DataTypeService.SavePreValues(dataType.Id, preValues.PreValuesAsDictionary);
                 Context.ClearRuntimeCache(typeof(IDataTypeDefinition)); // nuclear option, but cache is incorrect if values are added quickly enough
