@@ -232,6 +232,8 @@
     <Compile Include="Fluent\IContentFilteredSetSyntax.cs" />
     <Compile Include="Fluent\IContentSetSyntax.cs" />
     <Compile Include="Fluent\IDatabaseSyntax.cs" />
+    <Compile Include="Fluent\IMacroFilteredSetSyntax.cs" />
+    <Compile Include="Fluent\IMacroSyntax.cs" />
     <Compile Include="Fluent\PackageInstallSettings.cs" />
     <Compile Include="Infrastructure\MigrationRunEventArgs.cs" />
     <Compile Include="Infrastructure\MigrationRunStartingEventArgs.cs" />
@@ -246,6 +248,7 @@
     <Compile Include="Fluent\ISetSyntax.cs" />
     <Compile Include="Fluent\ITemplateFilteredSetSyntax.cs" />
     <Compile Include="Fluent\ITemplateSetSyntax.cs" />
+    <Compile Include="Internal\SyntaxImplementations\MacroSetSyntax.cs" />
     <Compile Include="Internal\SyntaxImplementations\PackageSetSyntax.cs" />
     <Compile Include="Internal\SyntaxImplementations\TemplateSetSyntax.cs" />
     <Compile Include="Internal\DatabaseMigrationRecordRepository.cs" />
