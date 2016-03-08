@@ -14,73 +14,58 @@ namespace uMigrate {
             Run();
         }
 
-        [PublicAPI] [NotNull] protected IMigrationContext Context { get; private set; }
+        // ReSharper disable once NotNullMemberIsNotInitialized
+        [PublicAPI, NotNull] protected IMigrationContext Context { get; private set; }
 
-        public virtual string Version {
-            get { return GetVersionFromTypeName(); }
-        }
+        public virtual string Version => GetVersionFromTypeName();
 
-        public virtual string Name {
-            get { return GetType().Name; }
-        }
+        public virtual string Name => GetType().Name;
 
         protected abstract void Run();
 
-        [PublicAPI]
-        public IContentSetSyntax Contents {
-            get { return new ContentSetSyntax(Context); }
-        }
+        [PublicAPI, NotNull] public IContentSetSyntax Contents => new ContentSetSyntax(Context);
 
-        [PublicAPI]
+        [PublicAPI, NotNull]
         public IContentTypeFilteredSetSyntax ContentType(string alias) {
             var contentType = Context.Services.ContentTypeService.GetContentType(alias);
             Ensure.That(contentType != null, "Content type '{0}' was not found.", alias);
             return new ContentTypeSetSyntax(Context, new[] { contentType });
         }
 
-        [PublicAPI]
-        public IContentTypeSetSyntax ContentTypes {
-            get { return new ContentTypeSetSyntax(Context); }
-        }
+        [PublicAPI, NotNull] public IContentTypeSetSyntax ContentTypes => new ContentTypeSetSyntax(Context);
 
-        [PublicAPI]
+        [PublicAPI, NotNull]
         public IDataTypeFilteredSetSyntax DataType(string name) {
             var dataTypes = DataTypes.Where(d => d.Name == name);
             Ensure.That(dataTypes.Objects.Count > 0, "Data type '{0}' was not found.", name);
             return dataTypes;
         }
 
-        [PublicAPI]
-        public IDataTypeSetSyntax DataTypes {
-            get { return new DataTypeSetSyntax(Context); }
-        }
+        [PublicAPI, NotNull] public IDataTypeSetSyntax DataTypes => new DataTypeSetSyntax(Context);
 
-        [PublicAPI]
+        [PublicAPI, NotNull]
         public ITemplateFilteredSetSyntax Template(string alias) {
             var template = Templates.Where(t => t.Alias == alias);
             Ensure.That(template.Objects.Count > 0, "Template '{0}' was not found.", alias);
             return template;
         }
 
-        [PublicAPI]
-        public ITemplateSetSyntax Templates {
-            get { return new TemplateSetSyntax(Context); }
+        [PublicAPI, NotNull] public IMacroSetSyntax Macros => new MacroSetSyntax(Context);
+
+        [PublicAPI, NotNull]
+        public IMacroFilteredSetSyntax Macro(string alias) {
+            var macro = Macros.Where(t => t.Alias == alias);
+            Ensure.That(macro.Objects.Count > 0, "Macro '{0}' was not found.", alias);
+            return macro;
         }
 
-        [PublicAPI]
-        public IDatabaseSyntax Database {
-            get { return new DatabaseSyntax(Context.Database, new EmbeddedResourceHelper(this)); }
-        }
+        [PublicAPI, NotNull] public ITemplateSetSyntax Templates => new TemplateSetSyntax(Context);
 
-        [PublicAPI]
-        public IPackageSetSyntax Packages {
-            get { return new PackageSetSyntax(Context); }
-        }
+        [PublicAPI, NotNull] public IPackageSetSyntax Packages => new PackageSetSyntax(Context);
 
-        [PublicAPI]
-        public IMigrationLogger Logger {
-            get { return Context.Logger; }
-        }
+        [PublicAPI, NotNull] public IDatabaseSyntax Database => new DatabaseSyntax(Context.Database, new EmbeddedResourceHelper(this));
+
+        [PublicAPI] public IMigrationLogger Logger => Context.Logger;
 
         private string GetVersionFromTypeName() {
             var name = GetType().Name;

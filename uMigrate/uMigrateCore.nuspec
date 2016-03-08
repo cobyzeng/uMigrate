@@ -9,6 +9,7 @@
     <description>$description$</description>
     <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
     <releaseNotes>
+      0.14.0 Added Macros fluent interface: Add, Change and Delete.
       0.13.0
         * Added uMigrate:Enabled app setting to disable uMigrate if needed.
         * Added ContentType.Parent, ContentType.SetParent, Template(alias), DataType.Change.

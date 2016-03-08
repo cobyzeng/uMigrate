@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Internal\StubCacheRefresher.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Internal\TestDatabaseHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Internal\TestUmbracoApplication.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MacroTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MigrationRecordTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PackageTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TemplateTests.cs" />
