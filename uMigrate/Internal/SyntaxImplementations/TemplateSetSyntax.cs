@@ -31,8 +31,10 @@ namespace uMigrate.Internal.SyntaxImplementations {
                 template = new Template(filePath, name, alias);
             }
             else if (template.Name != name) {
-                // temporary, can be implemented later if needed
-                throw new NotSupportedException($"Cannot add a template with alias '{alias}' name '{name}'. There is an existing template with that alias, but a different name ('{template.Name}'), which is not currently supported.");
+                template = new Template(filePath, name, alias) {
+                    Id = template.Id,
+                    CreateDate = template.CreateDate
+                };
             }
 
             template.Content = content;
