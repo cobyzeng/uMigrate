@@ -57,7 +57,9 @@ namespace uMigrate.Infrastructure {
 
             var logRepository = new DatabaseMigrationRecordRepository(applicationContext.DatabaseContext.Database);
 
-            var migrationResolver = new MigrationResolver(new AppDomainAssemblyMigrationTypeProvider());
+            var migrationResolver = new MigrationResolver(
+                new AppDomainAssemblyMigrationTypeProvider(LogManager.GetLogger(typeof(AppDomainAssemblyMigrationTypeProvider)))
+            );
             var context = new MigrationContext(
                 new ServiceContextWrapper(applicationContext.Services),
                 applicationContext.DatabaseContext.Database,
