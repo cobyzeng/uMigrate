@@ -9,6 +9,7 @@
     <description>$description$</description>
     <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
     <releaseNotes>
+      0.15.0 (pre) Corrected SetParent not adding parent to compositions.
       0.14.2 Improved handling of ReflectionTypeLoadException during migration discovery.
       0.14.1 Added template name update support to Template.Add.
       0.14.0 Added Macros fluent interface: Add, Change and Delete.
