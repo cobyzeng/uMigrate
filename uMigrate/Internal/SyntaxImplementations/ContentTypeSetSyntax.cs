@@ -84,19 +84,32 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return AllowUnder(NewSet(otherContentType));
         }
 
-        public IContentTypeSetSyntax SetParent(string parentContentTypeAlias) {
-            var newParentId = Constants.System.Root;
-            var newParentNameText = "none";
-            if (parentContentTypeAlias != null) {
-                var parentContentType = Services.ContentTypeService.GetContentType(parentContentTypeAlias);
-                Ensure.That(parentContentType != null, "Content type '{0}' was not found.", parentContentTypeAlias);
-                newParentId = parentContentType.Id;
-                newParentNameText = $"'{parentContentType.Name}'";
-            }
+        public IContentTypeSetSyntax SetParent(string parentContentTypeAlias, bool removeOldParentFromCompositions = false) {
+            if (parentContentTypeAlias == null)
+                return SetParent((IContentType) null, removeOldParentFromCompositions);
 
+            var parentContentType = Services.ContentTypeService.GetContentType(parentContentTypeAlias);
+            Ensure.That(parentContentType != null, "Content type '{0}' was not found.", parentContentTypeAlias);
+            return SetParent(parentContentType, removeOldParentFromCompositions);
+        }
+
+        public IContentTypeSetSyntax SetParent(IContentType parentContentType, bool removeOldParentFromCompositions = false) {
             return Change(c => {
-                c.ParentId = newParentId;
-                Logger.Log("ContentType: '{0}', set parent to {1}.", c.Name, newParentNameText);
+                if (removeOldParentFromCompositions) {
+                    var oldParentComposition = c.ContentTypeComposition.FirstOrDefault(cm => cm.Id == c.ParentId);
+                    if (oldParentComposition != null)
+                        c.RemoveContentType(oldParentComposition.Alias);
+                }
+
+                if (parentContentType != null) {
+                    c.ParentId = parentContentType.Id;
+                    c.AddContentType(parentContentType);
+                    Logger.Log("ContentType: '{0}', set parent to '{1}'.", c.Name, parentContentType.Name);
+                }
+                else {
+                    c.ParentId = Constants.System.Root;
+                    Logger.Log("ContentType: '{0}', set parent to none.", c.Name);
+                }
             });
         }
 

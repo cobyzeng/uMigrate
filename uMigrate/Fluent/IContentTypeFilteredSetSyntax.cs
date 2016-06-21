@@ -10,7 +10,8 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IContentTypeSetSyntax AllowUnder([NotNull] IContentTypeFilteredSetSyntax otherContentTypes);
         [PublicAPI, NotNull] IContentTypeSetSyntax AllowUnder([NotNull] string otherContentTypeAlias);
 
-        [PublicAPI, NotNull] IContentTypeSetSyntax SetParent([CanBeNull] string parentContentTypeAlias);
+        [PublicAPI, NotNull] IContentTypeSetSyntax SetParent([CanBeNull] string parentContentTypeAlias, bool removeOldParentFromCompositions = false);
+        [PublicAPI, NotNull] IContentTypeSetSyntax SetParent([CanBeNull] IContentType parentContentType, bool removeOldParentFromCompositions = false);
 
         [PublicAPI, NotNull] IContentTypeSetSyntax AddPropertyGroup([NotNull] string name);
         [PublicAPI, NotNull] IContentTypeSetSyntax RenamePropertyGroup([NotNull] string oldName, [NotNull] string newName);

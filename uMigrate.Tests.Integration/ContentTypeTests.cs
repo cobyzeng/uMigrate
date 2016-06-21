@@ -34,9 +34,31 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void SetParent_RemovesOldParentFromCompositions_IfRemoveOldParentIsSet() {
+            RunMigration(m => m.ContentTypes.Add("OldParent").AddChild("Child"));
+            RunMigration(m => m.ContentType("Child").SetParent((string)null, removeOldParentFromCompositions: true));
+
+            var childType = Services.ContentTypeService.GetContentType("Child");
+            Assert.IsFalse(childType.ContentTypeCompositionExists("OldParent"));
+        }
+
+        [Test]
+        public void SetParent_ChangesParentCorrectlySoThatPropertyTypesAreInherited() {
+            RunMigration(m => {
+                var stubDataType = m.DataTypes.Add("Stub", Constants.PropertyEditors.IntegerAlias, null);
+                m.ContentTypes.Add("Parent").AddProperty("parentProperty", stubDataType.Object);
+                m.ContentTypes.Add("Child").AddProperty("childProperty", stubDataType.Object);
+            });
+            RunMigration(m => m.ContentType("Child").SetParent("Parent"));
+
+            var childType = Services.ContentTypeService.GetContentType("Child");
+            Assert.IsTrue(childType.PropertyTypeExists("parentProperty"));
+        }
+
+        [Test]
         public void SetParent_RemovesParent_WhenSetToNull() {
             RunMigration(m => m.ContentTypes.Add("Parent").AddChild("Child"));
-            RunMigration(m => m.ContentType("Child").SetParent(null));
+            RunMigration(m => m.ContentType("Child").SetParent((string)null));
 
             var childType = Services.ContentTypeService.GetContentType("Child");
             Assert.AreEqual(Constants.System.Root, childType.ParentId);
