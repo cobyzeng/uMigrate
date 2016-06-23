@@ -15,20 +15,20 @@ namespace uMigrate.Tests.Integration {
             RunMigration(m => {
                 var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id);
                 var contentType = m.ContentTypes
-                    .Add("ContentType")
-                    .AddProperty("Property1", dataType.Object)
-                    .AddProperty("Property2", dataType.Object);
+                    .Add("contentType", "Content Type")
+                    .AddProperty("property1", "Property 1", dataType.Object)
+                    .AddProperty("property2", "Property 2", dataType.Object);
 
                 content = Services.ContentService.CreateContent("Content", -1, contentType.Object.Alias);
-                content.SetValue("Property1", "A");
-                content.SetValue("Property2", "B");
+                content.SetValue("property1", "A");
+                content.SetValue("property2", "B");
                 Services.ContentService.Save(content);
             });
             RunMigration(m => m.DataType("Test").ChangeAllPropertyValues<string, string>(s => s + s));
 
             var reloaded = Services.ContentService.GetById(content.Id);
-            Assert.AreEqual("AA", reloaded.GetValue("Property1"));
-            Assert.AreEqual("BB", reloaded.GetValue("Property2"));
+            Assert.AreEqual("AA", reloaded.GetValue("property1"));
+            Assert.AreEqual("BB", reloaded.GetValue("property2"));
         }
 
         [Test]
@@ -38,11 +38,11 @@ namespace uMigrate.Tests.Integration {
             RunMigration(m => {
                 var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id);
                 var contentType = m.ContentTypes
-                    .Add("ContentType")
-                    .AddProperty("Property", dataType.Object);
+                    .Add("contentType", "Content Type")
+                    .AddProperty("property", "Property", dataType.Object);
 
                 content = Services.ContentService.CreateContent("Content", -1, contentType.Object.Alias);
-                content.SetValue("Property", "TestPropertyValue");
+                content.SetValue("property", "TestPropertyValue");
                 Services.ContentService.Save(content);
             });
             RunMigration(m => m.DataType("Test").ChangeAllPropertyValues<string, string>(s => s));

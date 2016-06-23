@@ -6,7 +6,7 @@ using Umbraco.Core.Models;
 
 namespace uMigrate.Fluent {
     public interface IContentTypeFilteredSetSyntax : IFilteredSetSyntax<IContentType, IContentTypeFilteredSetSyntax> {
-        [PublicAPI, NotNull] IContentTypeSetSyntax AddChild([NotNull] string alias, params Action<IContentType>[] setups);
+        [PublicAPI, NotNull] IContentTypeSetSyntax AddChild([NotNull] string alias, [NotNull] string name, params Action<IContentType>[] setups);
         [PublicAPI, NotNull] IContentTypeSetSyntax AllowUnder([NotNull] IContentTypeFilteredSetSyntax otherContentTypes);
         [PublicAPI, NotNull] IContentTypeSetSyntax AllowUnder([NotNull] string otherContentTypeAlias);
 
@@ -19,8 +19,10 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IContentTypeSetSyntax SortPropertyGroups([NotNull] params string[] sortedPropertyGroupNames);
         [PublicAPI, NotNull] IContentTypeSetSyntax RemovePropertyGroup([NotNull] string name);
 
-        [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] string dataTypeName, [CanBeNull] string propertyGroupName = null, [NotNull] params Action<PropertyType>[] setups);
-        [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] IDataTypeDefinition dataType, [CanBeNull] string propertyGroupName = null, [NotNull] params Action<PropertyType>[] setups);
+        [Obsolete("This method is temporarily disabled to avoid old code ambiguity after the addition of propertyName argument. Please use one of the other overloads for now (you can still pass null as propertyGroupName).", true)]
+        [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] string propertyName, [NotNull] string dataTypeName, [NotNull] params Action<PropertyType>[] setups);
+        [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] string propertyName, [NotNull] string dataTypeName, [CanBeNull] string propertyGroupName, [NotNull] params Action<PropertyType>[] setups);
+        [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] string propertyName, [NotNull] IDataTypeDefinition dataType, [CanBeNull] string propertyGroupName = null, [NotNull] params Action<PropertyType>[] setups);
         [PublicAPI, NotNull] IContentTypeSetSyntax RemoveProperty([NotNull] string propertyAlias);
         [PublicAPI, NotNull] IContentTypeSetSyntax ChangeProperties([NotNull] Func<PropertyType, IContentType, bool> filter, [NotNull] Action<PropertyType, IContentType> change);
         [PublicAPI, NotNull] IContentTypeSetSyntax ChangeProperty([NotNull] string propertyAlias, [NotNull] Action<PropertyType> change);

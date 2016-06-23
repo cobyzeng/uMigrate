@@ -5,11 +5,6 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uMigrate", "uMigrate\uMigrate.csproj", "{0C0338A2-FE24-440E-86ED-79A17A041738}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D0010EF-083F-4E35-994E-5BDFE025FE54}"
-	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uMigrate.UI", "uMigrate.UI\uMigrate.UI.csproj", "{7A47D361-0943-4CA9-A4F9-942DDCCD1065}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uMigrate.Tests.Unit", "uMigrate.Tests.Unit\uMigrate.Tests.Unit.csproj", "{0D3D3FCB-DB2B-4341-AD47-69622208938B}"
