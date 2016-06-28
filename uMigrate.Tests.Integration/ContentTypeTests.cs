@@ -10,7 +10,7 @@ namespace uMigrate.Tests.Integration {
     public class ContentTypeTests : IntegrationTestsBase {
         [Test]
         public void Add_SetsNameToProvidedValue() {
-            RunMigration(m => m.ContentTypes.Add("test", "Test"));
+            Migrate(m => m.ContentTypes.Add("test", "Test"));
 
             var contentType = Services.ContentTypeService.GetContentType("test");
             Assert.AreEqual("Test", contentType.Name);
@@ -18,7 +18,7 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void AddChild_SetsNameToProvidedValue() {
-            RunMigration(m => {
+            Migrate(m => {
                 m.ContentTypes.Add("parent", "Parent")
                  .AddChild("child", "Child");
             });
@@ -29,7 +29,7 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void AddChild_CreatesChildWithInheritedProperty() {
-            RunMigration(m => {
+            Migrate(m => {
                 m.ContentTypes
                  .Add("parent", "Parent")
                  .AddProperty("parentProperty", "Parent Property", m.DataTypes.Add("Test", Constants.PropertyEditors.TextboxAlias, null).Object)
@@ -42,11 +42,11 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void SetParent_ChangesParentToNewValue() {
-            RunMigration(m => {
+            Prepare(m => {
                 m.ContentTypes.Add("parent", "Parent");
                 m.ContentTypes.Add("child", "Child");
             });
-            RunMigration(m => m.ContentType("child").SetParent("parent"));
+            Migrate(m => m.ContentType("child").SetParent("parent"));
 
             var childType = Services.ContentTypeService.GetContentType("child");
             var parentType = Services.ContentTypeService.GetContentType("parent");
@@ -55,8 +55,8 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void SetParent_RemovesOldParentFromCompositions_IfRemoveOldParentIsSet() {
-            RunMigration(m => m.ContentTypes.Add("oldParent", "Old Parent").AddChild("child", "Child"));
-            RunMigration(m => m.ContentType("child").SetParent((string)null, removeOldParentFromCompositions: true));
+            Prepare(m => m.ContentTypes.Add("oldParent", "Old Parent").AddChild("child", "Child"));
+            Migrate(m => m.ContentType("child").SetParent((string)null, removeOldParentFromCompositions: true));
 
             var childType = Services.ContentTypeService.GetContentType("child");
             Assert.IsFalse(childType.ContentTypeCompositionExists("oldParent"));
@@ -64,12 +64,12 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void SetParent_ChangesParentCorrectlySoThatPropertyTypesAreInherited() {
-            RunMigration(m => {
+            Prepare(m => {
                 var stubDataType = StubDataType(m);
                 m.ContentTypes.Add("parent", "Parent").AddProperty("parentProperty", "Parent Property", stubDataType);
                 m.ContentTypes.Add("child", "Child").AddProperty("childProperty", "Child Property", stubDataType);
             });
-            RunMigration(m => m.ContentType("child").SetParent("parent"));
+            Migrate(m => m.ContentType("child").SetParent("parent"));
 
             var childType = Services.ContentTypeService.GetContentType("child");
             Assert.IsTrue(childType.PropertyTypeExists("parentProperty"));
@@ -77,8 +77,8 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void SetParent_RemovesParent_WhenSetToNull() {
-            RunMigration(m => m.ContentTypes.Add("parent", "Parent").AddChild("child", "Child"));
-            RunMigration(m => m.ContentType("child").SetParent((string)null));
+            Prepare(m => m.ContentTypes.Add("parent", "Parent").AddChild("child", "Child"));
+            Migrate(m => m.ContentType("child").SetParent((string)null));
 
             var childType = Services.ContentTypeService.GetContentType("child");
             Assert.AreEqual(Constants.System.Root, childType.ParentId);
@@ -86,7 +86,7 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void SortPropertyGroups_ReordersPropertyGroups_WhenCurrentSortOrderDoesNotMatchComparison() {
-            RunMigration(m => {
+            Prepare(m => {
                 m.ContentTypes
                     .Add("test", "Test")
                     .AddPropertyGroup("PropertyGroup2")
@@ -95,7 +95,7 @@ namespace uMigrate.Tests.Integration {
             });
 
             // ReSharper disable once StringCompareIsCultureSpecific.1
-            RunMigration(m => m.ContentType("test").SortPropertyGroups((a, b) => string.Compare(a.Name, b.Name)));
+            Migrate(m => m.ContentType("test").SortPropertyGroups((a, b) => string.Compare(a.Name, b.Name)));
 
             var contentType = Services.ContentTypeService.GetContentType("test");
             CollectionAssert.AreEqual(
@@ -106,7 +106,7 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void SortPropertyGroups_ReordersPropertyGroups_WhenCurrentSortOrderDoesNotMatchProvided() {
-            RunMigration(m => {
+            Prepare(m => {
                 m.ContentTypes
                     .Add("test", "Test")
                     .AddPropertyGroup("PropertyGroup2")
@@ -115,7 +115,7 @@ namespace uMigrate.Tests.Integration {
             });
 
             // ReSharper disable once StringCompareIsCultureSpecific.1
-            RunMigration(m => m.ContentType("test").SortPropertyGroups("PropertyGroup1", "PropertyGroup2", "PropertyGroup3"));
+            Migrate(m => m.ContentType("test").SortPropertyGroups("PropertyGroup1", "PropertyGroup2", "PropertyGroup3"));
 
             var contentType = Services.ContentTypeService.GetContentType("test");
             CollectionAssert.AreEqual(
@@ -126,7 +126,9 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void AddProperty_SetsNameToProvidedValue() {
-            RunMigration(m => m.ContentTypes.Add("test", "Test").AddProperty("testProperty", "Test Property", StubDataType(m)));
+            Prepare(m => m.ContentTypes.Add("test", "Test"));
+
+            Migrate(m => m.ContentType("test").AddProperty("testProperty", "Test Property", StubDataType(m)));
 
             var property = Services.ContentTypeService.GetContentType("test").PropertyTypes.First(p => p.Alias == "testProperty");
             Assert.AreEqual("Test Property", property.Name);
@@ -134,9 +136,9 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void MoveProperty_MovesPropertyToDefaultGroup_IfGroupNameIsNull() {
-            RunMigration(m => m.ContentTypes.Add("test", "Test").AddProperty("property", "Property", StubDataType(m), propertyGroupName: "OldGroup"));
+            Prepare(m => m.ContentTypes.Add("test", "Test").AddProperty("property", "Property", StubDataType(m), propertyGroupName: "OldGroup"));
 
-            RunMigration(m => m.ContentType("test").MoveProperty("property", null));
+            Migrate(m => m.ContentType("test").MoveProperty("property", null));
 
             var contentType = Services.ContentTypeService.GetContentType("test");
             CollectionAssert.DoesNotContain(contentType.PropertyGroups["OldGroup"].PropertyTypes.Select(p => p.Alias), "property");
@@ -145,9 +147,9 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void MoveProperty_MovesPropertyToSpecifiedGroup() {
-            RunMigration(m => m.ContentTypes.Add("test", "Test").AddProperty("property", "Property", StubDataType(m)));
+            Prepare(m => m.ContentTypes.Add("test", "Test").AddProperty("property", "Property", StubDataType(m)));
 
-            RunMigration(m => m.ContentType("test").MoveProperty("property", "NewGroup"));
+            Migrate(m => m.ContentType("test").MoveProperty("property", "NewGroup"));
 
             var contentType = Services.ContentTypeService.GetContentType("test");
             CollectionAssert.Contains(contentType.PropertyGroups["NewGroup"].PropertyTypes.Select(p => p.Alias), "property");
@@ -155,7 +157,7 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void SortProperties_ReordersProperties_WhenCurrentSortOrderDoesNotMatchComparison() {
-            RunMigration(m => {
+            Prepare(m => {
                 var dataType = StubDataType(m);
                 m.ContentTypes
                     .Add("test", "Test")
@@ -165,7 +167,7 @@ namespace uMigrate.Tests.Integration {
             });
 
             // ReSharper disable once StringCompareIsCultureSpecific.1
-            RunMigration(m => m.ContentType("test").SortProperties(null, (a, b) => string.Compare(a.Name, b.Name)));
+            Migrate(m => m.ContentType("test").SortProperties(null, (a, b) => string.Compare(a.Name, b.Name)));
 
             var contentType = Services.ContentTypeService.GetContentType("test");
             CollectionAssert.AreEqual(
@@ -176,7 +178,7 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void SortProperties_ReordersProperties_WhenCurrentSortOrderDoesNotMatchProvided() {
-            RunMigration(m => {
+            Prepare(m => {
                 var dataType = StubDataType(m);
                 m.ContentTypes
                     .Add("test", "Test")
@@ -186,7 +188,7 @@ namespace uMigrate.Tests.Integration {
             });
 
             // ReSharper disable once StringCompareIsCultureSpecific.1
-            RunMigration(m => m.ContentType("test").SortProperties(null, "property1", "property2", "property3"));
+            Migrate(m => m.ContentType("test").SortProperties(null, "property1", "property2", "property3"));
 
             var contentType = Services.ContentTypeService.GetContentType("test");
             CollectionAssert.AreEqual(
@@ -198,7 +200,7 @@ namespace uMigrate.Tests.Integration {
         [Test]
         public void ChangePropertyValues_UpdatesBothPublishedAndLatestVersion_WhenContentSavePublishIsSetAccordingly() {
             IContent content = null;
-            Given(m => {
+            Prepare(m => {
                 MigrationConfiguration.ContentSavePublish = new SaveLatestAndSavePublishedIfNotLatest();
 
                 m.ContentTypes.Add("test", "Test");
@@ -208,7 +210,7 @@ namespace uMigrate.Tests.Integration {
                 Services.ContentService.Save(content);
             });
 
-            Run(m => m.ContentType("test").ChangeContents(_ => true, c => c.Name += ":Changed"));
+            Migrate(m => m.ContentType("test").ChangeContents(_ => true, c => c.Name += ":Changed"));
 
             var versions = Services.ContentService.GetVersions(content.Id);
             CollectionAssert.AreEquivalent(
@@ -225,7 +227,7 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void Parent_ReturnsAllParents() {
-            RunMigration(m => {
+            Prepare(m => {
                 m.ContentTypes
                     .Add("parent1", "Parent 1").AddChild("child1", "Child 1")
                     .Add("parent2", "Parent 2").AddChild("child2", "Child 2");
@@ -245,7 +247,7 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void Parent_ReturnsEmpty_IfContentTypeIsOnTopLevel() {
-            RunMigration(m => m.ContentTypes.Add("top", "Top"));
+            Prepare(m => m.ContentTypes.Add("top", "Top"));
             var parents = GetFluent(m => m.ContentType("top").Parent().Objects);
 
             CollectionAssert.IsEmpty(parents.Select(p => p.Name));
@@ -253,8 +255,8 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void Delete_RemovesByAlias_WhenCalledOnRootSetWithAlias() {
-            RunMigration(m => m.ContentTypes.Add("toDelete", "To Delete"));
-            RunMigration(m => m.ContentTypes.Delete("toDelete"));
+            Prepare(m => m.ContentTypes.Add("toDelete", "To Delete"));
+            Migrate(m => m.ContentTypes.Delete("toDelete"));
 
             var deleted = Services.ContentTypeService.GetContentType("toDelete");
             Assert.IsNull(deleted);
@@ -262,8 +264,8 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void Delete_RemovesAllFiltered_WhenCalledOnFilteredSet() {
-            RunMigration(m => m.ContentTypes.Add("toDelete", "To Delete"));
-            RunMigration(m => m.ContentTypes.Where(t => t.Alias == "toDelete").Delete());
+            Prepare(m => m.ContentTypes.Add("toDelete", "To Delete"));
+            Migrate(m => m.ContentTypes.Where(t => t.Alias == "toDelete").Delete());
 
             var deleted = Services.ContentTypeService.GetContentType("toDelete");
             Assert.IsNull(deleted);

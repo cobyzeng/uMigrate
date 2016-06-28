@@ -60,7 +60,7 @@ namespace uMigrate.Tests.Integration {
         }
 
         private void InstallPackage(string packageFileName, PackageInstallSettings settings = null) {
-            RunMigration(m => m.Packages.Install("~/TestPackages/" + packageFileName, settings));
+            Migrate(m => m.Packages.Install("~/TestPackages/" + packageFileName, settings));
         }
 
         protected override void BeforeEachTest() {

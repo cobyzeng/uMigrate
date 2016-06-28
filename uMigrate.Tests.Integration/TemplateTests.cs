@@ -19,7 +19,7 @@ namespace uMigrate.Tests.Integration {
             var template = new Template(path, "Old Name", "Test");
             Services.FileService.SaveTemplate(template);
 
-            RunMigration(m => m.Templates.Add(template.Alias, "New Name", RenderingEngine.Mvc));
+            Migrate(m => m.Templates.Add(template.Alias, "New Name", RenderingEngine.Mvc));
 
             var reloaded = Services.FileService.GetTemplate(template.Id);
             Assert.AreEqual("New Name", reloaded.Name);

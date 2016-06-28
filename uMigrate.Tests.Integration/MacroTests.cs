@@ -9,7 +9,7 @@ namespace uMigrate.Tests.Integration {
     public class MacroTests : IntegrationTestsBase {
         [Test]
         public void Add_CreatesNewMacro() {
-            RunMigration(m => m.Macros.Add("TestAlias", x => x.Name = "TestName"));
+            Prepare(m => m.Macros.Add("TestAlias", x => x.Name = "TestName"));
 
             var macro = Services.MacroService.GetByAlias("TestAlias");
             Assert.IsNotNull(macro);
@@ -18,9 +18,9 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void Add_UpdatesExistingMacro_IfMacroWithSpecifiedAliasAlreadyExists() {
-            RunMigration(m => m.Macros.Add("TestAlias", x => x.Name = "TestName1"));
+            Prepare(m => m.Macros.Add("TestAlias", x => x.Name = "TestName1"));
 
-            RunMigration(m => m.Macros.Add("TestAlias", x => x.Name = "TestName2"));
+            Migrate(m => m.Macros.Add("TestAlias", x => x.Name = "TestName2"));
 
             var macro = Services.MacroService.GetByAlias("TestAlias");
             Assert.IsNotNull(macro);
@@ -29,9 +29,9 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void Change_UpdatesMacro() {
-            RunMigration(m => m.Macros.Add("TestAlias", x => x.Name = "TestName1"));
+            Prepare(m => m.Macros.Add("TestAlias", x => x.Name = "TestName1"));
 
-            RunMigration(m => m.Macro("TestAlias").Change(x => x.Name = "TestName2"));
+            Migrate(m => m.Macro("TestAlias").Change(x => x.Name = "TestName2"));
 
             var macro = Services.MacroService.GetByAlias("TestAlias");
             Assert.IsNotNull(macro);
@@ -42,7 +42,7 @@ namespace uMigrate.Tests.Integration {
         public void Delete_DeletesMacro() {
             Macro.MakeNew("TestAlias");
 
-            RunMigration(m => m.Macro("TestAlias").Delete());
+            Migrate(m => m.Macro("TestAlias").Delete());
 
             var macro = Services.MacroService.GetByAlias("TestAlias");
             Assert.IsNull(macro);
@@ -52,7 +52,7 @@ namespace uMigrate.Tests.Integration {
         public void Delete_DeletesMacro_DirectlyByAlias() {
             Macro.MakeNew("TestAlias");
 
-            RunMigration(m => m.Macros.Delete("TestAlias"));
+            Migrate(m => m.Macros.Delete("TestAlias"));
 
             var macro = Services.MacroService.GetByAlias("TestAlias");
             Assert.IsNull(macro);

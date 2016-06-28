@@ -8,7 +8,7 @@ namespace uMigrate.Tests.Integration {
     public class MigrationRecordTests : IntegrationTestsBase {
         [Test]
         public void Log_DoesNotFail_IfLengthExceedsLimits() {
-            RunMigration(m => m.Logger.Log(new string('#', 9000)));
+            Migrate(m => m.Logger.Log(new string('#', 9000)));
 
             var log = MigrationRecords.GetAll().Last().Log;
             Assert.AreEqual(log.Length, MigrationRecord.DefaultMaxLogLength);

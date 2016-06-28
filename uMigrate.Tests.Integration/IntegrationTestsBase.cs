@@ -9,7 +9,6 @@ using NUnit.Framework;
 using uMigrate.Infrastructure;
 using uMigrate.Internal;
 using uMigrate.Tests.Integration.Internal;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 
 namespace uMigrate.Tests.Integration {
@@ -59,18 +58,12 @@ namespace uMigrate.Tests.Integration {
             );
         }
 
-        [Obsolete("Use Given or Run instead.")]
-        protected void RunMigration([InstantHandle] Action<UmbracoMigrationBase> run) {
-            _migration.NextRun = run;
-            _migrator.Run();
+        protected void Prepare([InstantHandle] Action<UmbracoMigrationBase> run) {
+            // the difference is only in sematics (Prepare = Arrange, Migrate = Act)
+            Migrate(run);
         }
 
-        protected void Given([InstantHandle] Action<UmbracoMigrationBase> run) {
-            _migration.NextRun = run;
-            _migrator.Run();
-        }
-
-        protected void Run([InstantHandle] Action<UmbracoMigrationBase> run) {
+        protected void Migrate([InstantHandle] Action<UmbracoMigrationBase> run) {
             _migration.NextRun = run;
             _migrator.Run();
         }

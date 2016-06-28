@@ -12,7 +12,7 @@ namespace uMigrate.Tests.Integration {
         public void ChangeAllPropertyValues_ChangesAllPropertiesOfSpecifiedType() {
             var id = Guid.NewGuid();
             IContent content = null;
-            RunMigration(m => {
+            Prepare(m => {
                 var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id);
                 var contentType = m.ContentTypes
                     .Add("contentType", "Content Type")
@@ -24,7 +24,7 @@ namespace uMigrate.Tests.Integration {
                 content.SetValue("property2", "B");
                 Services.ContentService.Save(content);
             });
-            RunMigration(m => m.DataType("Test").ChangeAllPropertyValues<string, string>(s => s + s));
+            Migrate(m => m.DataType("Test").ChangeAllPropertyValues<string, string>(s => s + s));
 
             var reloaded = Services.ContentService.GetById(content.Id);
             Assert.AreEqual("AA", reloaded.GetValue("property1"));
@@ -34,8 +34,8 @@ namespace uMigrate.Tests.Integration {
         [Test]
         public void ChangeAllPropertyValues_DoesNotLogChangeWhenValuesAreSame() {
             var id = Guid.NewGuid();
-            IContent content = null;
-            RunMigration(m => {
+            IContent content;
+            Prepare(m => {
                 var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id);
                 var contentType = m.ContentTypes
                     .Add("contentType", "Content Type")
@@ -45,7 +45,7 @@ namespace uMigrate.Tests.Integration {
                 content.SetValue("property", "TestPropertyValue");
                 Services.ContentService.Save(content);
             });
-            RunMigration(m => m.DataType("Test").ChangeAllPropertyValues<string, string>(s => s));
+            Migrate(m => m.DataType("Test").ChangeAllPropertyValues<string, string>(s => s));
 
             var record = MigrationRecords.GetAll().Last();
             StringAssert.DoesNotContain("TestPropertyValue", record.Log);
@@ -54,8 +54,8 @@ namespace uMigrate.Tests.Integration {
         [Test]
         public void SetEditorAlias_SetsEditorAlias() {
             var id = Guid.NewGuid();
-            RunMigration(m => m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id));
-            RunMigration(m => m.DataType("Test").SetEditorAlias(Constants.PropertyEditors.TextboxAlias));
+            Prepare(m => m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id));
+            Migrate(m => m.DataType("Test").SetEditorAlias(Constants.PropertyEditors.TextboxAlias));
 
             var dataType = Services.DataTypeService.GetDataTypeDefinitionById(id);
             Assert.AreEqual(Constants.PropertyEditors.TextboxAlias, dataType.PropertyEditorAlias);
@@ -64,8 +64,8 @@ namespace uMigrate.Tests.Integration {
         [Test]
         public void SetPreValue_DoesNotLosePreviousPreValues_WhenDoneQuicklyInSequence() {
             var dataTypeId = -1;
-            RunMigration(m => dataTypeId = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, Guid.NewGuid()).Object.Id);
-            RunMigration(m => m.DataType("Test").SetPreValue("A", "ValueOfA").SetPreValue("B", "ValueOfB"));
+            Prepare(m => dataTypeId = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, Guid.NewGuid()).Object.Id);
+            Migrate(m => m.DataType("Test").SetPreValue("A", "ValueOfA").SetPreValue("B", "ValueOfB"));
 
             var preValues = Services.DataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId);
 
@@ -76,9 +76,9 @@ namespace uMigrate.Tests.Integration {
         [Test]
         public void Change_SavesChanges() {
             var id = Guid.NewGuid();
-            RunMigration(m => m.DataTypes.Add("OldName", Constants.PropertyEditors.NoEditAlias, id));
+            Prepare(m => m.DataTypes.Add("OldName", Constants.PropertyEditors.NoEditAlias, id));
 
-            RunMigration(m => m.DataType("OldName").Change(d => d.Name = "NewName"));
+            Migrate(m => m.DataType("OldName").Change(d => d.Name = "NewName"));
 
             var dataType = Services.DataTypeService.GetDataTypeDefinitionById(id);
             Assert.AreEqual("NewName", dataType.Name);
@@ -87,8 +87,8 @@ namespace uMigrate.Tests.Integration {
         [Test]
         public void Delete_RemovesByAlias_WhenCalledOnRootSetWithAlias() {
             var id = Guid.NewGuid();
-            RunMigration(m => m.DataTypes.Add("ToDelete", Constants.PropertyEditors.TextboxAlias, id));
-            RunMigration(m => m.DataTypes.Delete("ToDelete"));
+            Prepare(m => m.DataTypes.Add("ToDelete", Constants.PropertyEditors.TextboxAlias, id));
+            Migrate(m => m.DataTypes.Delete("ToDelete"));
 
             var deleted = Services.DataTypeService.GetDataTypeDefinitionById(id);
             Assert.IsNull(deleted);
@@ -97,8 +97,8 @@ namespace uMigrate.Tests.Integration {
         [Test]
         public void Delete_RemovesAllFiltered_WhenCalledOnFilteredSet() {
             var id = Guid.NewGuid();
-            RunMigration(m => m.DataTypes.Add("ToDelete", Constants.PropertyEditors.TextboxAlias, id));
-            RunMigration(m => m.DataTypes.Where(t => t.Name == "ToDelete").Delete());
+            Prepare(m => m.DataTypes.Add("ToDelete", Constants.PropertyEditors.TextboxAlias, id));
+            Migrate(m => m.DataTypes.Where(t => t.Name == "ToDelete").Delete());
 
             var deleted = Services.DataTypeService.GetDataTypeDefinitionById(id);
             Assert.IsNull(deleted);
