@@ -243,6 +243,7 @@
     <Compile Include="Internal\IMigrationTypeProvider.cs" />
     <Compile Include="Internal\AppDomainAssemblyMigrationTypeProvider.cs" />
     <Compile Include="Fluent\IPackageSetSyntax.cs" />
+    <Compile Include="Internal\ObsoleteMessages.cs" />
     <Compile Include="Internal\ServiceContextWrapper.cs" />
     <Compile Include="Internal\SyntaxImplementations\ContentSetSyntax.cs" />
     <Compile Include="Fluent\IDataTypeFilteredSetSyntax.cs" />

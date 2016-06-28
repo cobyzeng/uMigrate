@@ -24,10 +24,20 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return item.Name;
         }
 
+        [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
+        public IContentTypeSetSyntax Add(string alias, params Action<IContentType>[] setups) {
+            return Add(alias, alias, setups);
+        }
+
         public IContentTypeSetSyntax Add(string alias, string name, params Action<IContentType>[] setups) {
             Argument.NotNullOrEmpty(nameof(alias), alias);
             Argument.NotNullOrEmpty(nameof(name), name);
             return AddInternal(null, null, alias, name, setups);
+        }
+
+        [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
+        public IContentTypeSetSyntax AddChild(string alias, params Action<IContentType>[] setups) {
+            return AddChild(alias, alias, setups);
         }
 
         public IContentTypeSetSyntax AddChild(string alias, string name, params Action<IContentType>[] setups) {
@@ -203,6 +213,11 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Logger.Log("ContentType: '{0}', removed tab '{1}'.", contentType.Name, name);
         }
 
+        [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
+        public IContentTypeSetSyntax AddProperty(string propertyAlias, string dataTypeName, string propertyGroupName = null, params Action<PropertyType>[] setups) {
+            return AddProperty(propertyAlias, propertyAlias, dataTypeName, propertyGroupName, setups);
+        }
+
         public IContentTypeSetSyntax AddProperty(string propertyAlias, string propertyName, string dataTypeName, string propertyGroupName, params Action<PropertyType>[] setups) {
             Argument.NotNullOrEmpty(nameof(propertyAlias), propertyAlias);
             Argument.NotNullOrEmpty(nameof(propertyName), propertyName);
@@ -214,8 +229,9 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return AddProperty(propertyAlias, propertyName, dataType, propertyGroupName, setups);
         }
 
-        public IContentTypeSetSyntax AddProperty(string propertyAlias, string propertyName, string dataTypeName, params Action<PropertyType>[] setups) {
-            throw new NotSupportedException("This method is temporarily disabled to avoid old code ambiguity after the addition of propertyName argument. Please use one of the other overloads for now (you can still pass null as propertyGroupName).");
+        [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
+        public IContentTypeSetSyntax AddProperty(string propertyAlias, IDataTypeDefinition dataType, string propertyGroupName = null, params Action<PropertyType>[] setups) {
+            return AddProperty(propertyAlias, propertyAlias, dataType, propertyGroupName, setups);
         }
 
         public IContentTypeSetSyntax AddProperty(string propertyAlias, string propertyName, IDataTypeDefinition dataType, string propertyGroupName = null, params Action<PropertyType>[] setups) {
