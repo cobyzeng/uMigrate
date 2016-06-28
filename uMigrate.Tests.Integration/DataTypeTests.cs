@@ -16,8 +16,9 @@ namespace uMigrate.Tests.Integration {
                 var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id);
                 var contentType = m.ContentTypes
                     .Add("contentType", "Content Type")
-                    .AddProperty("property1", "Property 1", dataType.Object)
-                    .AddProperty("property2", "Property 2", dataType.Object);
+                    .PropertyGroup(null)
+                        .AddProperty("property1", "Property 1", dataType.Object)
+                        .AddProperty("property2", "Property 2", dataType.Object);
 
                 content = Services.ContentService.CreateContent("Content", -1, contentType.Object.Alias);
                 content.SetValue("property1", "A");
@@ -39,7 +40,7 @@ namespace uMigrate.Tests.Integration {
                 var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id);
                 var contentType = m.ContentTypes
                     .Add("contentType", "Content Type")
-                    .AddProperty("property", "Property", dataType.Object);
+                    .PropertyGroup(null).AddProperty("property", "Property", dataType.Object);
 
                 content = Services.ContentService.CreateContent("Content", -1, contentType.Object.Alias);
                 content.SetValue("property", "TestPropertyValue");

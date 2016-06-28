@@ -16,18 +16,18 @@ namespace uMigrate.Fluent {
         [PublicAPI, NotNull] IContentTypeSetSyntax SetParent([CanBeNull] string parentContentTypeAlias, bool removeOldParentFromCompositions = false);
         [PublicAPI, NotNull] IContentTypeSetSyntax SetParent([CanBeNull] IContentType parentContentType, bool removeOldParentFromCompositions = false);
 
-        [PublicAPI, NotNull] IContentTypeSetSyntax AddPropertyGroup([NotNull] string name);
+        [PublicAPI, NotNull] IContentTypePropertyGroupSetSyntax PropertyGroup([CanBeNull] string name);
+        [PublicAPI, NotNull] IContentTypePropertyGroupSetSyntax AddPropertyGroup([NotNull] string name);
         [PublicAPI, NotNull] IContentTypeSetSyntax RenamePropertyGroup([NotNull] string oldName, [NotNull] string newName);
         [PublicAPI, NotNull] IContentTypeSetSyntax SortPropertyGroups([NotNull] Func<PropertyGroup, PropertyGroup, int> compare);
         [PublicAPI, NotNull] IContentTypeSetSyntax SortPropertyGroups([NotNull] params string[] sortedPropertyGroupNames);
         [PublicAPI, NotNull] IContentTypeSetSyntax RemovePropertyGroup([NotNull] string name);
 
-        [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
+        [Obsolete(ObsoleteMessages.UseAddPropertyFromPropertyGroup)]
         [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] string dataTypeName, [CanBeNull] string propertyGroupName = null, [NotNull] params Action<PropertyType>[] setups);
-        [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] string propertyName, [NotNull] string dataTypeName, [CanBeNull] string propertyGroupName, [CanBeNull] Action<PropertyType> setup = null);
-        [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
+        [Obsolete(ObsoleteMessages.UseAddPropertyFromPropertyGroup)]
         [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] IDataTypeDefinition dataType, [CanBeNull] string propertyGroupName = null, [NotNull] params Action<PropertyType>[] setups);
-        [PublicAPI, NotNull] IContentTypeSetSyntax AddProperty([NotNull] string propertyAlias, [NotNull] string propertyName, [NotNull] IDataTypeDefinition dataType, [CanBeNull] string propertyGroupName = null, [CanBeNull] Action<PropertyType> setup = null);
+
         [PublicAPI, NotNull] IContentTypeSetSyntax RemoveProperty([NotNull] string propertyAlias);
         [PublicAPI, NotNull] IContentTypeSetSyntax ChangeProperties([NotNull] Func<PropertyType, IContentType, bool> filter, [NotNull] Action<PropertyType, IContentType> change);
         [PublicAPI, NotNull] IContentTypeSetSyntax ChangeProperty([NotNull] string propertyAlias, [NotNull] Action<PropertyType> change);

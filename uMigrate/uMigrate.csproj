@@ -227,6 +227,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fluent\IContentTypeFilteredSetSyntax.cs" />
+    <Compile Include="Fluent\IContentTypePropertyGroupSetSyntax.cs" />
     <Compile Include="Fluent\IContentTypeSetSyntax.cs" />
     <Compile Include="Fluent\IContentFilteredSetSyntax.cs" />
     <Compile Include="Fluent\IContentSetSyntax.cs" />

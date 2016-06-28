@@ -30,7 +30,8 @@ namespace uMigrate.Tests.Integration {
             Prepare(m =>
                 m.ContentTypes
                  .Add("parent", "Parent")
-                 .AddProperty("parentProperty", "Parent Property", m.DataTypes.Add("Test", Constants.PropertyEditors.TextboxAlias, null).Object)
+                 .PropertyGroup(null)
+                    .AddProperty("parentProperty", "Parent Property", m.DataTypes.Add("Test", Constants.PropertyEditors.TextboxAlias, null).Object)
             );
 
             Migrate(m => m.ContentType("parent").AddChild("child", "Child"));
@@ -76,8 +77,8 @@ namespace uMigrate.Tests.Integration {
         public void SetParent_ChangesParentCorrectlySoThatPropertyTypesAreInherited() {
             Prepare(m => {
                 var stubDataType = StubDataType(m);
-                m.ContentTypes.Add("parent", "Parent").AddProperty("parentProperty", "Parent Property", stubDataType);
-                m.ContentTypes.Add("child", "Child").AddProperty("childProperty", "Child Property", stubDataType);
+                m.ContentTypes.Add("parent", "Parent").PropertyGroup(null).AddProperty("parentProperty", "Parent Property", stubDataType);
+                m.ContentTypes.Add("child", "Child").PropertyGroup(null).AddProperty("childProperty", "Child Property", stubDataType);
             });
             Migrate(m => m.ContentType("child").SetParent("parent"));
 
@@ -92,6 +93,16 @@ namespace uMigrate.Tests.Integration {
 
             var childType = Services.ContentTypeService.GetContentType("child");
             Assert.AreEqual(Constants.System.Root, childType.ParentId);
+        }
+
+        [Test]
+        public void PropertyGroup_Throws_IfPropertyGroupWithThatNameDoesNotExist() {
+            Prepare(m => m.ContentTypes.Add("test", "Test"));
+
+            var exception = Assert.Throws<UmbracoMigrationException>(
+                () => Migrate(m => m.ContentType("test").PropertyGroup("Missingro"))
+            );
+            StringAssert.Contains("Missingro", exception.Message);
         }
 
         [Test]
@@ -138,15 +149,25 @@ namespace uMigrate.Tests.Integration {
         public void AddProperty_SetsNameToProvidedValue() {
             Prepare(m => m.ContentTypes.Add("test", "Test"));
 
-            Migrate(m => m.ContentType("test").AddProperty("testProperty", "Test Property", StubDataType(m)));
+            Migrate(m => m.ContentType("test").PropertyGroup(null).AddProperty("testProperty", "Test Property", StubDataType(m)));
 
             var property = Services.ContentTypeService.GetContentType("test").PropertyTypes.First(p => p.Alias == "testProperty");
             Assert.AreEqual("Test Property", property.Name);
         }
 
         [Test]
+        public void AddProperty_SetsPropertyGroupToSelectedPropertyGroup() {
+            Prepare(m => m.ContentTypes.Add("test", "Test").AddPropertyGroup("Test Group"));
+
+            Migrate(m => m.ContentType("test").PropertyGroup("Test Group").AddProperty("testProperty", "Test Property", StubDataType(m)));
+
+            var group = Services.ContentTypeService.GetContentType("test").PropertyGroups.First(g => g.Name == "Test Group");
+            Assert.IsTrue(group.PropertyTypes.Contains("testProperty"));
+        }
+
+        [Test]
         public void MoveProperty_MovesPropertyToDefaultGroup_IfGroupNameIsNull() {
-            Prepare(m => m.ContentTypes.Add("test", "Test").AddProperty("property", "Property", StubDataType(m), propertyGroupName: "OldGroup"));
+            Prepare(m => m.ContentTypes.Add("test", "Test").AddPropertyGroup	("OldGroup").AddProperty("property", "Property", StubDataType(m)));
 
             Migrate(m => m.ContentType("test").MoveProperty("property", null));
 
@@ -157,7 +178,7 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void MoveProperty_MovesPropertyToSpecifiedGroup() {
-            Prepare(m => m.ContentTypes.Add("test", "Test").AddProperty("property", "Property", StubDataType(m)));
+            Prepare(m => m.ContentTypes.Add("test", "Test").PropertyGroup(null).AddProperty("property", "Property", StubDataType(m)));
 
             Migrate(m => m.ContentType("test").MoveProperty("property", "NewGroup"));
 
@@ -171,9 +192,10 @@ namespace uMigrate.Tests.Integration {
                 var dataType = StubDataType(m);
                 m.ContentTypes
                     .Add("test", "Test")
-                    .AddProperty("property2", "Property 2", dataType)
-                    .AddProperty("property3", "Property 3", dataType)
-                    .AddProperty("property1", "Property 1", dataType);
+                    .PropertyGroup(null)
+                        .AddProperty("property2", "Property 2", dataType)
+                        .AddProperty("property3", "Property 3", dataType)
+                        .AddProperty("property1", "Property 1", dataType);
             });
 
             // ReSharper disable once StringCompareIsCultureSpecific.1
@@ -192,9 +214,10 @@ namespace uMigrate.Tests.Integration {
                 var dataType = StubDataType(m);
                 m.ContentTypes
                     .Add("test", "Test")
-                    .AddProperty("property2", "Property 2", dataType)
-                    .AddProperty("property3", "Property 3", dataType)
-                    .AddProperty("property1", "Property 1", dataType);
+                    .PropertyGroup(null)
+                        .AddProperty("property2", "Property 2", dataType)
+                        .AddProperty("property3", "Property 3", dataType)
+                        .AddProperty("property1", "Property 1", dataType);
             });
 
             // ReSharper disable once StringCompareIsCultureSpecific.1

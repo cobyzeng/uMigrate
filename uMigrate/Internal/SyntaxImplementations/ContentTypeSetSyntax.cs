@@ -8,8 +8,8 @@ using Umbraco.Core.Models;
 using uMigrate.Fluent;
 
 namespace uMigrate.Internal.SyntaxImplementations {
-    public class ContentTypeSetSyntax : SetSyntaxBase<IContentType, IContentTypeSetSyntax, IContentTypeFilteredSetSyntax>, IContentTypeSetSyntax {
-        private string _lastAddedPropertyGroupName;
+    public class ContentTypeSetSyntax : SetSyntaxBase<IContentType, IContentTypeSetSyntax, IContentTypeFilteredSetSyntax>, IContentTypePropertyGroupSetSyntax {
+        private string _currentPropertyGroupName;
 
         public ContentTypeSetSyntax(IMigrationContext context, [CanBeNull] IReadOnlyList<IContentType> contentTypes = null)
             : base(context, () => contentTypes ?? context.Services.ContentTypeService.GetAllContentTypes().AsReadOnlyList())
@@ -129,9 +129,20 @@ namespace uMigrate.Internal.SyntaxImplementations {
             });
         }
 
-        public IContentTypeSetSyntax AddPropertyGroup(string name) {
+        public IContentTypePropertyGroupSetSyntax PropertyGroup(string name) {
+            if (name == null) {
+                _currentPropertyGroupName = null;
+                return this;
+            }
+
+            Ensure.That(Objects.Any(o => o.PropertyGroups.Contains(name)), "Property group '{0}' was not found on any content type.", name);
+            _currentPropertyGroupName = name;
+            return this;
+        }
+
+        public IContentTypePropertyGroupSetSyntax AddPropertyGroup(string name) {
             Change(c => AddPropertyGroupIfNeededInternal(c, name));
-            _lastAddedPropertyGroupName = name;
+            _currentPropertyGroupName = name;
             return this;
         }
 
@@ -214,12 +225,18 @@ namespace uMigrate.Internal.SyntaxImplementations {
             Logger.Log("ContentType: '{0}', removed tab '{1}'.", contentType.Name, name);
         }
 
-        [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
+        [Obsolete(ObsoleteMessages.UseAddPropertyFromPropertyGroup)]
         public IContentTypeSetSyntax AddProperty(string propertyAlias, string dataTypeName, string propertyGroupName = null, params Action<PropertyType>[] setups) {
-            return AddProperty(propertyAlias, propertyAlias, dataTypeName, propertyGroupName, setups.InvokeAll);
+            Argument.NotNullOrEmpty(nameof(propertyAlias), propertyAlias);
+            Argument.NotNullOrEmpty(nameof(dataTypeName), dataTypeName);
+
+            var dataType = Services.DataTypeService.GetAllDataTypeDefinitions().SingleOrDefault(t => t.Name == dataTypeName);
+            Ensure.That(dataType != null, "Data type '{0}' was not found.", dataTypeName);
+
+            return AddPropertyInternal(propertyAlias, propertyAlias, dataType, propertyGroupName, setups.InvokeAll);
         }
 
-        public IContentTypeSetSyntax AddProperty(string propertyAlias, string propertyName, string dataTypeName, string propertyGroupName, Action<PropertyType> setup = null) {
+        public IContentTypePropertyGroupSetSyntax AddProperty(string propertyAlias, string propertyName, string dataTypeName, Action<PropertyType> setup = null) {
             Argument.NotNullOrEmpty(nameof(propertyAlias), propertyAlias);
             Argument.NotNullOrEmpty(nameof(propertyName), propertyName);
             Argument.NotNullOrEmpty(nameof(dataTypeName), dataTypeName);
@@ -227,33 +244,37 @@ namespace uMigrate.Internal.SyntaxImplementations {
             var dataType = Services.DataTypeService.GetAllDataTypeDefinitions().SingleOrDefault(t => t.Name == dataTypeName);
             Ensure.That(dataType != null, "Data type '{0}' was not found.", dataTypeName);
 
-            return AddProperty(propertyAlias, propertyName, dataType, propertyGroupName, setup);
+            return AddProperty(propertyAlias, propertyName, dataType, setup);
         }
 
-        [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
+        [Obsolete(ObsoleteMessages.UseAddPropertyFromPropertyGroup)]
         public IContentTypeSetSyntax AddProperty(string propertyAlias, IDataTypeDefinition dataType, string propertyGroupName = null, params Action<PropertyType>[] setups) {
-            return AddProperty(propertyAlias, propertyAlias, dataType, propertyGroupName, setups.InvokeAll);
+            return AddPropertyInternal(propertyAlias, propertyAlias, dataType, propertyGroupName, setups.InvokeAll);
         }
 
-        public IContentTypeSetSyntax AddProperty(string propertyAlias, string propertyName, IDataTypeDefinition dataType, string propertyGroupName = null, Action<PropertyType> setup = null) {
+        public IContentTypePropertyGroupSetSyntax AddProperty(string propertyAlias, string propertyName, IDataTypeDefinition dataType, Action<PropertyType> setup = null) {
+            return AddPropertyInternal(propertyAlias, propertyName, dataType, null, setup);
+        }
+
+        private IContentTypePropertyGroupSetSyntax AddPropertyInternal([NotNull] string propertyAlias, [NotNull] string propertyName, [NotNull] IDataTypeDefinition dataType, [CanBeNull] string obsoletePropertyGroupNameOverride, Action<PropertyType> setup) {
             Argument.NotNullOrEmpty(nameof(propertyAlias), propertyAlias);
             Argument.NotNullOrEmpty(nameof(propertyName), propertyName);
             Argument.NotNull(nameof(dataType), dataType);
 
-            return Change(contentType => {
+            return (IContentTypePropertyGroupSetSyntax)Change(contentType => {
                 var propertyType = contentType.PropertyTypes.SingleOrDefault(t => t.Alias == propertyAlias);
                 if (propertyType != null) {
                     UpdatePropertyInsteadOfAdding(contentType, propertyType, dataType, setup);
                     return;
                 }
 
-                propertyGroupName = propertyGroupName ?? _lastAddedPropertyGroupName;
+                var propertyGroupName = obsoletePropertyGroupNameOverride ?? _currentPropertyGroupName;
                 propertyType = new PropertyType(dataType) {
                     Name = propertyName,
                     Alias = propertyAlias,
                     Description = "" // must not be null, or PackageService and/or uSync would crash
                 };
-                
+
                 if (propertyGroupName != null) {
                     AddPropertyGroupIfNeededInternal(contentType, propertyGroupName);
                     contentType.AddPropertyType(propertyType, propertyGroupName);
