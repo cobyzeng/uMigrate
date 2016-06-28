@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using log4net;
 using Moq;
 using NUnit.Framework;
 using uMigrate.Infrastructure;
 using uMigrate.Internal;
 using uMigrate.Tests.Integration.Internal;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 
 namespace uMigrate.Tests.Integration {
@@ -21,19 +23,9 @@ namespace uMigrate.Tests.Integration {
             _application = new TestUmbracoApplication();
             _application.Start();
 
-            var database = _application.ApplicationContext.DatabaseContext.Database;
-            MigrationRecords = new DatabaseMigrationRecordRepository(database);
-            _migrator = new UmbracoMigrator(
-                Mock.Of<IMigrationResolver>(m => m.GetAllMigrations() == new[] {_migration}),
-                new MigrationContext(
-                    new ServiceContextWrapper(_application.ApplicationContext.Services),
-                    database,
-                    _application.ApplicationContext.ApplicationCache,
-                    MigrationRecords,
-                    new MigrationLogger(TextWriter.Null, LogManager.GetLogger(typeof(MigrationLogger)))
-                ),
-                LogManager.GetLogger(typeof(UmbracoMigrator))
-            );
+            MigrationRecords = new DatabaseMigrationRecordRepository(_application.ApplicationContext.DatabaseContext.Database);
+            MigrationConfiguration = new MigrationConfiguration();
+            _migrator = CreateMigrator();
         }
 
         [TearDown]
@@ -46,16 +38,44 @@ namespace uMigrate.Tests.Integration {
             _migrator = null;
         }
 
-        public IMigrationRecordRepository MigrationRecords { get; private set; }
-        
+        protected IMigrationRecordRepository MigrationRecords { get; private set; }
+        protected MigrationConfiguration MigrationConfiguration { get; private set; }
+
         protected ServiceContext Services => _application?.ApplicationContext.Services;
 
-        protected void RunMigration(Action<UmbracoMigrationBase> run) {
+        private UmbracoMigrator CreateMigrator() {
+            var applicationContext = _application.ApplicationContext;
+            return new UmbracoMigrator(
+                Mock.Of<IMigrationResolver>(m => m.GetAllMigrations() == new[] { _migration }),
+                new MigrationContext(
+                    new ServiceContextWrapper(applicationContext.Services),
+                    applicationContext.DatabaseContext.Database,
+                    applicationContext.ApplicationCache,
+                    MigrationRecords,
+                    MigrationConfiguration,
+                    new MigrationLogger(TextWriter.Null, LogManager.GetLogger(typeof(MigrationLogger)))
+                ),
+                LogManager.GetLogger(typeof(UmbracoMigrator))
+            );
+        }
+
+        [Obsolete("Use Given or Run instead.")]
+        protected void RunMigration([InstantHandle] Action<UmbracoMigrationBase> run) {
             _migration.NextRun = run;
             _migrator.Run();
         }
 
-        protected T GetFluent<T>(Func<UmbracoMigrationBase, T> get) {
+        protected void Given([InstantHandle] Action<UmbracoMigrationBase> run) {
+            _migration.NextRun = run;
+            _migrator.Run();
+        }
+
+        protected void Run([InstantHandle] Action<UmbracoMigrationBase> run) {
+            _migration.NextRun = run;
+            _migrator.Run();
+        }
+
+        protected T GetFluent<T>([InstantHandle] Func<UmbracoMigrationBase, T> get) {
             var result = default(T);
             _migration.NextRun = m => result = get(m);
             _migrator.Run();
@@ -69,9 +89,7 @@ namespace uMigrate.Tests.Integration {
                 NextRun(this);
             }
 
-            public override string Version {
-                get { return "Test-" + Guid.NewGuid().ToString("N"); }
-            }
+            public override string Version => $"Test-{Guid.NewGuid():N}";
         }
     }
 }

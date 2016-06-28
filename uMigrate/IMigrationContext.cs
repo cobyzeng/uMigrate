@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
+using uMigrate.Infrastructure;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -13,7 +14,7 @@ namespace uMigrate {
 
         // this one is not mockable at the moment, but we may not want to use it in the future anyway
         [NotNull] UmbracoDatabase Database { get; }
-        
+
         // this should not normally be used by migrations, but just in case
         [NotNull] IMigrationRecordRepository MigrationRecords { get; }
 
@@ -26,6 +27,8 @@ namespace uMigrate {
 
         // ContentTypeService crashes if you try to do rename through it, so I am using old APIs here
         void WorkaroundToRenamePropertyGroupAndSave([NotNull] PropertyGroup propertyGroup, [NotNull] string newName);
+
+        MigrationConfiguration Configuration { get; }
 
         [NotNull] IMigrationContext WithLogger([CanBeNull] IMigrationLogger logger);
     }

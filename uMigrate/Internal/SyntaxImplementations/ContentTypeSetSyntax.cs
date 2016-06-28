@@ -462,15 +462,20 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         private void ChangeContents(IContentType contentType, Func<IContent, bool> filter, Action<IContent> change) {
-            var contents = Services.ContentService.GetContentOfContentType(contentType.Id).Where(filter);
+            var savePublish = Context.Configuration.ContentSavePublish;
+            var contents = Services.ContentService
+                .GetContentOfContentType(contentType.Id)
+                .SelectMany(c => savePublish.GetVersionsToChange(c, Context))
+                .Where(filter);
+
             contents.MigrateEach(c => {
                 change(c);
-                Services.ContentService.SaveThenPublishIfPublished(c);
+                savePublish.SaveAndOrPublish(c, Context);
             });
         }
 
         public IContentTypeSetSyntax Delete(string alias) {
-            Argument.NotNull("alias", alias);
+            Argument.NotNull(nameof(alias), alias);
             var contentType = Services.ContentTypeService.GetContentType(alias);
             if (contentType == null) {
                 Logger.Log("ContentType: '{0}' doesn't exist, no need to delete.", alias);

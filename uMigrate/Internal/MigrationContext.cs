@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using umbraco;
 using umbraco.cms.businesslogic.propertytype;
+using uMigrate.Infrastructure;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
@@ -21,11 +22,13 @@ namespace uMigrate.Internal {
             [NotNull] UmbracoDatabase database,
             [NotNull] CacheHelper cacheHelper,
             [NotNull] IMigrationRecordRepository migrationRecords,
+            [NotNull] MigrationConfiguration configuration,
             [CanBeNull] IMigrationLogger logger = null
         ) {
             Services = Argument.NotNull(nameof(services), services);
             Database = Argument.NotNull(nameof(database), database);
             MigrationRecords = Argument.NotNull(nameof(migrationRecords), migrationRecords);
+            Configuration = Argument.NotNull(nameof(configuration), configuration);
             Logger = logger;
 
             _cacheHelper = cacheHelper;
@@ -62,9 +65,10 @@ namespace uMigrate.Internal {
         public IMigrationRecordRepository MigrationRecords { get; private set; }
         public IMigrationLogger Logger { get; private set; }
         public IServiceContext Services { get; private set; }
+        public MigrationConfiguration Configuration { get; }
 
         public IMigrationContext WithLogger(IMigrationLogger logger) {
-            return new MigrationContext(Services, Database, _cacheHelper, MigrationRecords, logger);
+            return new MigrationContext(Services, Database, _cacheHelper, MigrationRecords, Configuration, logger);
         }
     }
 }

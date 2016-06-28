@@ -174,7 +174,8 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         private void ChangePropertyValues<TFrom, TTo>(IContentType contentType, PropertyType[] properties, Func<TFrom, IContent, PropertyType, TTo> change, IReadOnlyDictionary<int, IDataTypeDefinition> dataTypes) {
-            var contents = Services.ContentService.GetContentOfContentType(contentType.Id);
+            var savePublish = Context.Configuration.ContentSavePublish;
+            var contents = Services.ContentService.GetContentOfContentType(contentType.Id).SelectMany(c => savePublish.GetVersionsToChange(c, Context));
             var logCount = 0;
             contents.MigrateEach(c => {
                 var changed = false;
@@ -193,7 +194,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
                 });
 
                 if (changed)
-                    Services.ContentService.SaveThenPublishIfPublished(c);
+                    savePublish.SaveAndOrPublish(c, Context);
             });
 
             if (logCount > 10)

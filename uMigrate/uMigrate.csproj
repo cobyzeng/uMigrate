@@ -226,7 +226,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions.cs" />
     <Compile Include="Fluent\IContentTypeFilteredSetSyntax.cs" />
     <Compile Include="Fluent\IContentTypeSetSyntax.cs" />
     <Compile Include="Fluent\IContentFilteredSetSyntax.cs" />
@@ -235,6 +234,10 @@
     <Compile Include="Fluent\IMacroFilteredSetSyntax.cs" />
     <Compile Include="Fluent\IMacroSyntax.cs" />
     <Compile Include="Fluent\PackageInstallSettings.cs" />
+    <Compile Include="Infrastructure\Content\SaveLatestAndPublishIfPublished.cs" />
+    <Compile Include="Infrastructure\Content\SaveLatestAndSavePublishedIfNotLatest.cs" />
+    <Compile Include="Infrastructure\Content\IContentSavePublish.cs" />
+    <Compile Include="Infrastructure\MigrationConfiguration.cs" />
     <Compile Include="Infrastructure\MigrationRunEventArgs.cs" />
     <Compile Include="Infrastructure\MigrationRunStartingEventArgs.cs" />
     <Compile Include="Internal\IMigrationTypeProvider.cs" />

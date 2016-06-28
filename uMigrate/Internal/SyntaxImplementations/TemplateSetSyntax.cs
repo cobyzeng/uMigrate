@@ -83,9 +83,13 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         private void RemoveAllReferencesToTemplate(IContent content, ITemplate template, bool canDeleteContentVersions) {
-            if (content.Template != null && content.Template.Alias == template.Alias) {
-                content.Template = null;
-                Services.ContentService.SaveThenPublishIfPublished(content);
+            var savePublish = Context.Configuration.ContentSavePublish;
+            foreach (var version in savePublish.GetVersionsToChange(content, Context)) {
+                if (version.Template == null || version.Template.Alias != template.Alias)
+                    continue;
+
+                version.Template = null;
+                savePublish.SaveAndOrPublish(content, Context);
                 Logger.Log($"Content: '{content.Name}' (id {content.Id}), set default template to none.");
             }
 

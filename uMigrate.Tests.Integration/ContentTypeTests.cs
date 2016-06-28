@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using uMigrate.Infrastructure.Content;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 
@@ -191,6 +192,34 @@ namespace uMigrate.Tests.Integration {
             CollectionAssert.AreEqual(
                 new[] { "property1", "property2", "property3" },
                 contentType.PropertyTypes.OrderBy(p => p.SortOrder).Select(p => p.Alias).ToArray()
+            );
+        }
+
+        [Test]
+        public void ChangePropertyValues_UpdatesBothPublishedAndLatestVersion_WhenContentSavePublishIsSetAccordingly() {
+            IContent content = null;
+            Given(m => {
+                MigrationConfiguration.ContentSavePublish = new SaveLatestAndSavePublishedIfNotLatest();
+
+                m.ContentTypes.Add("test", "Test");
+                content = m.Contents.Add("Published", "test").Object;
+                Services.ContentService.Publish(content);
+                content.Name = "Latest";
+                Services.ContentService.Save(content);
+            });
+
+            Run(m => m.ContentType("test").ChangeContents(_ => true, c => c.Name += ":Changed"));
+
+            var versions = Services.ContentService.GetVersions(content.Id);
+            CollectionAssert.AreEquivalent(
+                new[] {
+                    new { Name = "Published:Changed", Published = true },
+                    new { Name = "Latest:Changed", Published = false },
+                },
+                versions
+                    .OrderByDescending(v => v.UpdateDate)
+                    .Take(2)
+                    .Select(v => new { v.Name, v.Published })
             );
         }
 
