@@ -28,11 +28,9 @@ namespace uMigrate.Internal.SyntaxImplementations {
                 macro = Context.Services.MacroService.GetById(legacyMacro.Id);
             }
 
-            foreach (var setup in setups) {
-                setup(macro);
-            }
+            setups.InvokeAll(macro);
             Services.MacroService.Save(macro);
-            Logger.Log("Macro: {0} '{1}'.", added ? "added" : "updated", alias);
+            Logger.Log($"Macro: {(added ? "added" : "updated")} '{alias}'.");
             return this;
         }
 

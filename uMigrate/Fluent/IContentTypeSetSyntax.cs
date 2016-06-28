@@ -9,7 +9,7 @@ namespace uMigrate.Fluent {
     public interface IContentTypeSetSyntax : IContentTypeFilteredSetSyntax, ISetSyntax<IContentType, IContentTypeSetSyntax, IContentTypeFilteredSetSyntax> {
         [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
         [PublicAPI, NotNull] IContentTypeSetSyntax Add([NotNull] string alias, params Action<IContentType>[] setups);
-        [PublicAPI, NotNull] IContentTypeSetSyntax Add([NotNull] string alias, [NotNull] string name, params Action<IContentType>[] setups);
+        [PublicAPI, NotNull] IContentTypeSetSyntax Add([NotNull] string alias, [NotNull] string name, [CanBeNull] Action<IContentType> setup = null);
         [PublicAPI, NotNull] IContentTypeSetSyntax Delete([NotNull] string alias);
     }
 }

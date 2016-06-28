@@ -59,12 +59,10 @@ namespace uMigrate.Internal {
                 ?? new ReadOnlyCollection<T>((items as IList<T> ?? items.ToList()));
         }
 
-        public static byte[] ReadAllBytes([NotNull] this IFileSystem fileSystem, string path) {
-            var memory = new MemoryStream();
-            using (var stream = fileSystem.OpenFile(path)) {
-                stream.CopyTo(memory);
+        internal static void InvokeAll<T>(this IEnumerable<Action<T>> actions, T argument) {
+            foreach (var action in actions) {
+                action(argument);
             }
-            return memory.ToArray();
         }
 
         public static string ReadAllText([NotNull] this IFileSystem fileSystem, string path) {

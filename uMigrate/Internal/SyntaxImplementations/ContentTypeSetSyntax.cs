@@ -26,27 +26,31 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
         public IContentTypeSetSyntax Add(string alias, params Action<IContentType>[] setups) {
-            return Add(alias, alias, setups);
+            return Add(alias, alias, setups.InvokeAll);
         }
 
-        public IContentTypeSetSyntax Add(string alias, string name, params Action<IContentType>[] setups) {
+        public IContentTypeSetSyntax Add(string alias, string name, Action<IContentType> setup = null) {
             Argument.NotNullOrEmpty(nameof(alias), alias);
             Argument.NotNullOrEmpty(nameof(name), name);
-            return AddInternal(null, null, alias, name, setups);
+            return AddInternal(null, null, alias, name, setup);
         }
 
         [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
         public IContentTypeSetSyntax AddChild(string alias, params Action<IContentType>[] setups) {
-            return AddChild(alias, alias, setups);
+            return AddChild(alias, alias, setups.InvokeAll);
         }
-
-        public IContentTypeSetSyntax AddChild(string alias, string name, params Action<IContentType>[] setups) {
+        
+        public IContentTypeSetSyntax AddChild(string alias, string name, Action<IContentType> setup = null, Action<IContentTypeFilteredSetSyntax> and = null) {
             Argument.NotNullOrEmpty(nameof(alias), alias);
             Argument.NotNullOrEmpty(nameof(name), name);
-            return ChangeWithManualSave(c => AddInternal(c, c.Name, alias, name, setups));
+
+            return ChangeWithManualSave(c => {
+                var child = AddInternal(c, c.Name, alias, name, setup);
+                and?.Invoke(child);
+            });
         }
 
-        private IContentTypeSetSyntax AddInternal(IContentType parent, [CanBeNull] string parentName, string alias, string name, params Action<IContentType>[] setups) {
+        private IContentTypeSetSyntax AddInternal(IContentType parent, [CanBeNull] string parentName, string alias, string name, Action<IContentType> setup) {
             var contentTypes = Services.ContentTypeService.GetContentTypeChildren(parent?.Id ?? -1);
             var contentType = contentTypes.FirstOrDefault(t => t.Alias == alias);
             var isNew = false;
@@ -61,10 +65,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             else {
                 contentType.Name = name;
             }
-
-            foreach (var setup in setups) {
-                setup(contentType);
-            }
+            setup?.Invoke(contentType);
 
             Services.ContentTypeService.Save(contentType);
             Logger.Log("ContentType: {0} '{1}'{2}.", isNew ? "added" : "updated", contentType.Name, parentName != null ? " under " + parentName : "");
@@ -215,10 +216,10 @@ namespace uMigrate.Internal.SyntaxImplementations {
 
         [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
         public IContentTypeSetSyntax AddProperty(string propertyAlias, string dataTypeName, string propertyGroupName = null, params Action<PropertyType>[] setups) {
-            return AddProperty(propertyAlias, propertyAlias, dataTypeName, propertyGroupName, setups);
+            return AddProperty(propertyAlias, propertyAlias, dataTypeName, propertyGroupName, setups.InvokeAll);
         }
 
-        public IContentTypeSetSyntax AddProperty(string propertyAlias, string propertyName, string dataTypeName, string propertyGroupName, params Action<PropertyType>[] setups) {
+        public IContentTypeSetSyntax AddProperty(string propertyAlias, string propertyName, string dataTypeName, string propertyGroupName, Action<PropertyType> setup = null) {
             Argument.NotNullOrEmpty(nameof(propertyAlias), propertyAlias);
             Argument.NotNullOrEmpty(nameof(propertyName), propertyName);
             Argument.NotNullOrEmpty(nameof(dataTypeName), dataTypeName);
@@ -226,15 +227,15 @@ namespace uMigrate.Internal.SyntaxImplementations {
             var dataType = Services.DataTypeService.GetAllDataTypeDefinitions().SingleOrDefault(t => t.Name == dataTypeName);
             Ensure.That(dataType != null, "Data type '{0}' was not found.", dataTypeName);
 
-            return AddProperty(propertyAlias, propertyName, dataType, propertyGroupName, setups);
+            return AddProperty(propertyAlias, propertyName, dataType, propertyGroupName, setup);
         }
 
         [Obsolete(ObsoleteMessages.UseOverloadThatTakesName)]
         public IContentTypeSetSyntax AddProperty(string propertyAlias, IDataTypeDefinition dataType, string propertyGroupName = null, params Action<PropertyType>[] setups) {
-            return AddProperty(propertyAlias, propertyAlias, dataType, propertyGroupName, setups);
+            return AddProperty(propertyAlias, propertyAlias, dataType, propertyGroupName, setups.InvokeAll);
         }
 
-        public IContentTypeSetSyntax AddProperty(string propertyAlias, string propertyName, IDataTypeDefinition dataType, string propertyGroupName = null, params Action<PropertyType>[] setups) {
+        public IContentTypeSetSyntax AddProperty(string propertyAlias, string propertyName, IDataTypeDefinition dataType, string propertyGroupName = null, Action<PropertyType> setup = null) {
             Argument.NotNullOrEmpty(nameof(propertyAlias), propertyAlias);
             Argument.NotNullOrEmpty(nameof(propertyName), propertyName);
             Argument.NotNull(nameof(dataType), dataType);
@@ -242,7 +243,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             return Change(contentType => {
                 var propertyType = contentType.PropertyTypes.SingleOrDefault(t => t.Alias == propertyAlias);
                 if (propertyType != null) {
-                    UpdatePropertyInsteadOfAdding(contentType, propertyType, dataType, setups);
+                    UpdatePropertyInsteadOfAdding(contentType, propertyType, dataType, setup);
                     return;
                 }
 
@@ -252,11 +253,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
                     Alias = propertyAlias,
                     Description = "" // must not be null, or PackageService and/or uSync would crash
                 };
-
-                foreach (var setup in setups) {
-                    setup(propertyType);
-                }
-
+                
                 if (propertyGroupName != null) {
                     AddPropertyGroupIfNeededInternal(contentType, propertyGroupName);
                     contentType.AddPropertyType(propertyType, propertyGroupName);
@@ -274,27 +271,22 @@ namespace uMigrate.Internal.SyntaxImplementations {
             });
         }
 
-        private void UpdatePropertyInsteadOfAdding(IContentType contentType, PropertyType propertyType, IDataTypeDefinition newDataType, params Action<PropertyType>[] setups) {
+        private void UpdatePropertyInsteadOfAdding(IContentType contentType, PropertyType propertyType, IDataTypeDefinition newDataType, Action<PropertyType> setup = null) {
             if (propertyType.DataTypeDefinitionId != newDataType.Id) {
-                var message = string.Format(
-                    "Property '{0}' already exists, but has type id '{1}' instead of '{2}'. Changing property type through AddProperty is not supported.",
-                    propertyType.Alias, propertyType.DataTypeDefinitionId, newDataType.Id
-                );
+                var message = $"Property '{propertyType.Alias}' already exists, but has type id '{propertyType.DataTypeDefinitionId}' instead of '{newDataType.Id}'. Changing property type through AddProperty is not supported.";
                 throw new NotSupportedException(message);
             }
 
             var oldName = propertyType.Name;
             var oldMandatory = propertyType.Mandatory;
 
-            foreach (var setup in setups) {
-                setup(propertyType);
-            }
+            setup?.Invoke(propertyType);
 
             Logger.Log(
                 "ContentType: '{0}', updated property '{1}' ('{2}'){3}{4}.",
                 contentType.Name, propertyType.Name, propertyType.Alias,
-                oldName == propertyType.Name ? "" : string.Format(", renamed from '{0}' to '{1}'", oldName, propertyType.Name),
-                oldMandatory == propertyType.Mandatory ? "" : string.Format(", mandatory {0} => {1}", oldMandatory ? "yes" : "no", propertyType.Mandatory ? "yes" : "no")
+                oldName == propertyType.Name ? "" : $", renamed from '{oldName}' to '{propertyType.Name}'",
+                oldMandatory == propertyType.Mandatory ? "" : $", mandatory {(oldMandatory ? "yes" : "no")} => {(propertyType.Mandatory ? "yes" : "no")}"
             );
         }
 

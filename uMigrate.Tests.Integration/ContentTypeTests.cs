@@ -18,10 +18,8 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void AddChild_SetsNameToProvidedValue() {
-            Migrate(m => {
-                m.ContentTypes.Add("parent", "Parent")
-                 .AddChild("child", "Child");
-            });
+            Prepare(m => m.ContentTypes.Add("parent", "Parent"));
+            Migrate(m => m.ContentType("parent").AddChild("child", "Child"));
 
             var childType = Services.ContentTypeService.GetContentType("child");
             Assert.AreEqual("Child", childType.Name);
@@ -29,15 +27,27 @@ namespace uMigrate.Tests.Integration {
 
         [Test]
         public void AddChild_CreatesChildWithInheritedProperty() {
-            Migrate(m => {
+            Prepare(m =>
                 m.ContentTypes
                  .Add("parent", "Parent")
                  .AddProperty("parentProperty", "Parent Property", m.DataTypes.Add("Test", Constants.PropertyEditors.TextboxAlias, null).Object)
-                 .AddChild("child", "Child");
-            });
+            );
+
+            Migrate(m => m.ContentType("parent").AddChild("child", "Child"));
 
             var childType = Services.ContentTypeService.GetContentType("child");
             Assert.IsTrue(childType.PropertyTypeExists("parentProperty"));
+        }
+
+        [Test]
+        public void AddChild_CreatesChildOfChild_WhenCalledThroughNestedLambda() {
+            Prepare(m => m.ContentTypes.Add("parent", "Parent"));
+
+            Migrate(m => m.ContentType("parent").AddChild("child", "Child", and: c => c.AddChild("childOfChild", "Child of child")));
+
+            var childType = Services.ContentTypeService.GetContentType("child");
+            var childOfChildType = Services.ContentTypeService.GetContentType("childOfChild");
+            Assert.AreEqual(childOfChildType.ParentId, childType.Id);
         }
 
         [Test]
