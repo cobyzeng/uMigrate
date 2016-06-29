@@ -216,13 +216,18 @@ namespace uMigrate.Internal.SyntaxImplementations {
         }
 
         public IContentTypeSetSyntax RemovePropertyGroup(string name) {
-            Change(contentType => RemovePropertyGroupInternal(contentType, name));
-            return this;
+            Argument.NotNullOrEmpty(nameof(name), name);
+            return Change(contentType => RemovePropertyGroupInternal(contentType, name));
         }
 
         private void RemovePropertyGroupInternal(IContentType contentType, string name) {
+            if (!contentType.PropertyGroups.Contains(name)) {
+                Logger.Log($"ContentType: '{contentType.Name}', tab '{name}' does not exist — no need to remove.");
+                return;
+            }
+
             contentType.RemovePropertyGroup(name);
-            Logger.Log("ContentType: '{0}', removed tab '{1}'.", contentType.Name, name);
+            Logger.Log($"ContentType: '{contentType.Name}', removed tab '{name}'.");
         }
 
         [Obsolete(ObsoleteMessages.UseAddPropertyFromPropertyGroup)]
@@ -518,7 +523,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
         public void Delete() {
             ChangeWithManualSave(c => {
                 Services.ContentTypeService.Delete(c);
-                Logger.Log("ContentType: '{0}' deleted", c.Name);
+                Logger.Log("ContentType: '{0}' deleted.", c.Name);
             });
         }
 

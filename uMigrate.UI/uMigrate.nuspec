@@ -9,6 +9,7 @@
     <description>Migration framework for Umbraco (Core+UI).</description>
     <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
     <releaseNotes>
+      0.15.1 (pre) Fixed bug with RemovePropertyGroup failing if PropertyGroup does not exist.
       0.15.0
         * Added a way to customize Save and Publish for content changes.
         * Changed most Add* methods to take name as the second argument.

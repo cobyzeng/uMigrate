@@ -146,6 +146,14 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void RemovePropertyGroup_DoesNotThrow_IfPropertyGroupDoesNotExist() {
+            Prepare(m => m.ContentTypes.Add("test", "Test"));
+
+            // Assert.DoesNotThrow does not log nested exceptions correctly
+            Migrate(m => m.ContentType("test").RemovePropertyGroup("NoSuchGroup"));
+        }
+
+        [Test]
         public void AddProperty_SetsNameToProvidedValue() {
             Prepare(m => m.ContentTypes.Add("test", "Test"));
 
