@@ -10,32 +10,31 @@ namespace uMigrate.Internal.SyntaxImplementations {
             : base(context, () => contents ?? context.Services.ContentService.GetDescendants(-1).AsReadOnlyList()) {
         }
 
-        public IContentSetSyntax Add(string name, string contentTypeAlias) {
-            Argument.NotNullOrEmpty("name", name);
-            Argument.NotNullOrEmpty("contentTypeAlias", contentTypeAlias);
+        public IContentSetSyntax Add(string name, string contentTypeAlias, Action<IContent> setup = null) {
+            Argument.NotNullOrEmpty(nameof(name), name);
+            Argument.NotNullOrEmpty(nameof(contentTypeAlias), contentTypeAlias);
 
             var contentType = Services.ContentTypeService.GetContentType(contentTypeAlias);
             Ensure.That(contentType != null, "Could not find content type '{0}'.", contentTypeAlias);
-            return Add(name, contentType);
+            return Add(name, contentType, setup);
         }
 
-        public IContentSetSyntax Add(string name, IContentType contentType) {
-            Argument.NotNullOrEmpty("name", name);
-            Argument.NotNull("contentType", contentType);
+        public IContentSetSyntax Add(string name, IContentType contentType, Action<IContent> setup = null) {
+            Argument.NotNullOrEmpty(nameof(name), name);
+            Argument.NotNull(nameof(contentType), contentType);
 
             var content = new Content(name, -1, contentType);
+            setup?.Invoke(content);
             Services.ContentService.SaveAndPublishWithStatus(content);
 
             Logger.Log("Content: added '{0}'.", content.Name);
-            return NewSet(new[] { content });
+            return NewSet(content);
         }
 
         protected override IContentSetSyntax NewSet(IEnumerable<IContent> items) {
             return new ContentSetSyntax(Context, items.AsReadOnlyList());
         }
 
-        protected override string GetName(IContent item) {
-            return item.Name;
-        }
+        protected override string GetName(IContent item) => item.Name;
     }
 }

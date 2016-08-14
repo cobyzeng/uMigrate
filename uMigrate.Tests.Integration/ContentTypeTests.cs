@@ -239,6 +239,23 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void ChangeProperty_AppliesToRelevantContentsImmediately() {
+            var contentId = 0;
+            Prepare(m => {
+                var contentType = m.ContentTypes.Add("test", "Test")
+                    .PropertyGroup(null).AddProperty("property", "Property", StubDataType(m))
+                    .Object;
+
+                contentId = m.Contents.Add("Content", contentType, c => c.SetValue("property", "testValue")).Object.Id;
+            });
+
+            Migrate(m => m.ContentType("test").ChangeProperty("property", p => p.Alias = "propertyRenamed"));
+
+            var reloaded = Services.ContentService.GetById(contentId);
+            Assert.AreEqual("testValue", reloaded.GetValue("propertyRenamed"));
+        }
+
+        [Test]
         public void ChangePropertyValues_UpdatesBothPublishedAndLatestVersion_WhenContentSavePublishIsSetAccordingly() {
             IContent content = null;
             Prepare(m => {

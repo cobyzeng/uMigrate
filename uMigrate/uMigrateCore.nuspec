@@ -9,6 +9,9 @@
     <description>$description$</description>
     <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
     <releaseNotes>
+      0.16.0 (pre)
+        * Fixed Content cache not being refreshed after a ContentType change
+        * Added setup to Content.Add.
       0.15.1 Fixed bug with RemovePropertyGroup failing if PropertyGroup does not exist.
       0.15.0
         * Added a way to customize Save and Publish for content changes.

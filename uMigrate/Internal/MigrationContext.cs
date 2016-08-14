@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using JetBrains.Annotations;
 using umbraco;
 using umbraco.cms.businesslogic.propertytype;
@@ -9,11 +10,14 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace uMigrate.Internal {
     public class MigrationContext : IMigrationContext {
-        private static readonly bool UmbracoHasIsolatedCache = 
-            typeof (CacheHelper).GetProperty("IsolatedRuntimeCache") != null;
+        private static readonly bool UmbracoHasIsolatedCache = typeof(CacheHelper).GetProperty("IsolatedRuntimeCache") != null;
+
+        // I think this is for early versions only (e.g. 7.1.4)
+        private static readonly Action<Type> ClearLegacyRepositoryCache = BuildClearLegacyRepositoryCache();
 
         private readonly CacheHelper _cacheHelper;
 
@@ -47,6 +51,10 @@ namespace uMigrate.Internal {
             }
 
             cache.ClearAllCache();
+
+            // This is some private APIs that don't seem to be relevant since at least 7.3.5,
+            // but we'll keep them until we drop 7.1.4
+            ClearLegacyRepositoryCache?.Invoke(entityType);
         }
 
         public void RefreshContent() {
@@ -69,6 +77,23 @@ namespace uMigrate.Internal {
 
         public IMigrationContext WithLogger(IMigrationLogger logger) {
             return new MigrationContext(Services, Database, _cacheHelper, MigrationRecords, Configuration, logger);
+        }
+
+        private static Action<Type> BuildClearLegacyRepositoryCache() {
+            var assembly = typeof(IRepository).Assembly;
+            var currentProviderProperty = assembly.GetType("Umbraco.Core.Persistence.Caching.RuntimeCacheProvider")?.GetProperty("Current");
+            if (currentProviderProperty == null)
+                return null;
+
+            var clearMethod = assembly.GetType("Umbraco.Core.Persistence.Caching.IRepositoryCacheProvider")?.GetMethod("Clear");
+            if (clearMethod == null)
+                return null;
+
+            var typeParameter = Expression.Parameter(typeof(Type));
+            return Expression.Lambda<Action<Type>>(
+                Expression.Call(Expression.Property(null, currentProviderProperty), clearMethod, typeParameter),
+                typeParameter
+            ).Compile();
         }
     }
 }

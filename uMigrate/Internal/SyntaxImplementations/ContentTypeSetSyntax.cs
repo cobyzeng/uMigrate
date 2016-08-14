@@ -444,6 +444,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             ChangeWithManualSave(change);
             Services.ContentTypeService.Save(Objects);
             Context.ClearRuntimeCache(typeof(IContentType));
+            Context.ClearRuntimeCache(typeof(IContent));
             return this;
         }
 
