@@ -174,6 +174,20 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void AddProperty_AppliesSpecifiedSetup() {
+            Prepare(m => m.ContentTypes.Add("test", "Test"));
+
+            Migrate(m => m.ContentType("test").PropertyGroup(null).AddProperty("testProperty", "Test Property", StubDataType(m), p => {
+                p.Mandatory = true;
+                p.Description = "Test Description";
+            }));
+
+            var property = Services.ContentTypeService.GetContentType("test").PropertyTypes.First(p => p.Alias == "testProperty");
+            Assert.AreEqual("Test Description", property.Description);
+            Assert.AreEqual(true, property.Mandatory);
+        }
+
+        [Test]
         public void MoveProperty_MovesPropertyToDefaultGroup_IfGroupNameIsNull() {
             Prepare(m => m.ContentTypes.Add("test", "Test").AddPropertyGroup	("OldGroup").AddProperty("property", "Property", StubDataType(m)));
 

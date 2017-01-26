@@ -279,6 +279,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
                     Alias = propertyAlias,
                     Description = "" // must not be null, or PackageService and/or uSync would crash
                 };
+                setup?.Invoke(propertyType);
 
                 if (propertyGroupName != null) {
                     AddPropertyGroupIfNeededInternal(contentType, propertyGroupName);

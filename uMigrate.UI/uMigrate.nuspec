@@ -3,12 +3,13 @@
   <metadata>
     <id>uMigrate</id>
     <version>$version$</version>
-    <title>uMigrate for Umbraco</title>    
+    <title>uMigrate for Umbraco</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
     <description>Migration framework for Umbraco (Core+UI).</description>
     <projectUrl>https://github.com/AffinityID/uMigrate</projectUrl>
     <releaseNotes>
+      0.15.2 Fixed bug with AddProperty not calling setup if the property didn't exist.
       0.15.1 Fixed bug with RemovePropertyGroup failing if PropertyGroup does not exist.
       0.15.0
         * Added a way to customize Save and Publish for content changes.
