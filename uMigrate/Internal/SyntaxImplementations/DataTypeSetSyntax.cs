@@ -139,7 +139,7 @@ namespace uMigrate.Internal.SyntaxImplementations {
             var dataTypes = Objects.ToDictionary(t => t.Id);
             var allContentTypes = Services.ContentTypeService.GetAllContentTypes();
             allContentTypes.MigrateEach(contentType => {
-                var relevantProperties = contentType.PropertyTypes.Where(p => dataTypes.ContainsKey(p.DataTypeDefinitionId)).ToArray();
+                var relevantProperties = contentType.CompositionPropertyTypes.Where(p => dataTypes.ContainsKey(p.DataTypeDefinitionId)).ToArray();
                 if (!relevantProperties.Any())
                     return;
 

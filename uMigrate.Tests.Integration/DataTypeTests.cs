@@ -53,6 +53,27 @@ namespace uMigrate.Tests.Integration {
         }
 
         [Test]
+        public void ChangeAllPropertyValues_ChangesInheritedProperties() {
+            var id = Guid.NewGuid();
+            IContent child = null;
+            Prepare(m => {
+                var dataType = m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id);
+                var parentType = m.ContentTypes
+                    .Add("parent", "Parent")
+                    .PropertyGroup(null).AddProperty("property", "Property", dataType.Object);
+                var childType = m.ContentTypes.Add("child", "Child").SetParent(parentType.Object);
+
+                child = Services.ContentService.CreateContent("Content", -1, childType.Object.Alias);
+                child.SetValue("property", "old");
+                Services.ContentService.Save(child);
+            });
+            Migrate(m => m.DataType("Test").ChangeAllPropertyValues<string, string>(s => "new"));
+
+            var reloaded = Services.ContentService.GetById(child.Id);
+            Assert.AreEqual("new", reloaded.GetValue("property"));
+        }
+
+        [Test]
         public void SetEditorAlias_SetsEditorAlias() {
             var id = Guid.NewGuid();
             Prepare(m => m.DataTypes.Add("Test", Constants.PropertyEditors.NoEditAlias, id));
