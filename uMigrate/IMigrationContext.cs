@@ -12,7 +12,8 @@ namespace uMigrate {
         [PublicAPI] [NotNull] IServiceContext Services { get; }
         [NotNull] IFileSystem GetFileSystem(string rootPath);
 
-        // this one is not mockable at the moment, but we may not want to use it in the future anyway
+        //Test
+		// this one is not mockable at the moment, but we may not want to use it in the future anyway
         [NotNull] UmbracoDatabase Database { get; }
 
         // this should not normally be used by migrations, but just in case
